@@ -570,14 +570,34 @@ app.get("/api/analysis/:symbol", async (req, res) => {
     const payload = await response.json();
     const m = payload.metric || {};
     const observations = [];
-    if (Number.isFinite(m.peTTM)) observations.push(m.peTTM > 30
-      ? "P/E สูงกว่า 30 เท่า: ควรตรวจสอบว่าการเติบโตของกำไรรองรับมูลค่าหรือไม่"
-      : m.peTTM > 0 ? "P/E อยู่ที่ " + m.peTTM.toFixed(2) + " เท่า; ควรเปรียบเทียบกับคู่แข่งในอุตสาหกรรม"
-      : "P/E ติดลบหรือไม่พร้อมใช้งาน จึงไม่ควรใช้ P/E แบบทั่วไปในการประเมิน");
-    if (Number.isFinite(m.roeTTM)) observations.push("ROE: " + m.roeTTM.toFixed(2) + "%; ตรวจสอบแนวโน้มหลายปีและระดับหนี้ประกอบ");
-    if (Number.isFinite(m.netProfitMarginTTM)) observations.push("อัตรากำไรสุทธิ: " + m.netProfitMarginTTM.toFixed(2) + "%");
-    if (Number.isFinite(m.revenueGrowthTTMYoy)) observations.push("การเติบโตของรายได้ YoY: " + m.revenueGrowthTTMYoy.toFixed(2) + "%");
-    if (!observations.length) observations.push("ข้อมูลตัวชี้วัดไม่เพียงพอสำหรับสรุป โปรดลองหุ้นอื่นหรือตรวจสอบสิทธิ์ API");
+    const numeric = key => m[key] === null || m[key] === undefined || m[key] === "" ? null : Number.isFinite(Number(m[key])) ? Number(m[key]) : null;
+    const pe = numeric("peTTM");
+    const roe = numeric("roeTTM");
+    const margin = numeric("netProfitMarginTTM");
+    const revenueGrowth = numeric("revenueGrowthTTMYoy");
+    if (pe !== null) observations.push({
+      text: pe > 30
+        ? "P/E สูงกว่า 30 เท่า: ควรตรวจสอบว่าการเติบโตของกำไรรองรับมูลค่าหรือไม่"
+        : pe > 0 ? "P/E อยู่ที่ " + pe.toFixed(2) + " เท่า; ควรเปรียบเทียบกับคู่แข่งในอุตสาหกรรม"
+        : "P/E ติดลบ จึงไม่ควรใช้ P/E แบบทั่วไปในการประเมิน",
+      severity: pe > 30 || pe <= 0 ? "negative" : "neutral"
+    });
+    if (roe !== null) observations.push({
+      text: "ROE: " + roe.toFixed(2) + "%; ตรวจสอบแนวโน้มหลายปีและระดับหนี้ประกอบ",
+      severity: roe < 0 ? "negative" : roe >= 15 ? "positive" : "neutral"
+    });
+    if (margin !== null) observations.push({
+      text: "อัตรากำไรสุทธิ: " + margin.toFixed(2) + "%",
+      severity: margin < 0 ? "negative" : margin > 0 ? "positive" : "neutral"
+    });
+    if (revenueGrowth !== null) observations.push({
+      text: "การเติบโตของรายได้ YoY: " + revenueGrowth.toFixed(2) + "%",
+      severity: revenueGrowth < 0 ? "negative" : revenueGrowth > 0 ? "positive" : "neutral"
+    });
+    if (!observations.length) observations.push({
+      text: "ข้อมูลตัวชี้วัดไม่เพียงพอสำหรับสรุป โปรดลองหุ้นอื่นหรือตรวจสอบสิทธิ์ API",
+      severity: "neutral"
+    });
     res.json({
       symbol,
       observations,
