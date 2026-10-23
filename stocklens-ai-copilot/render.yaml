@@ -3,7 +3,7 @@ services:
     name: stocklens-ai
     runtime: node
     plan: free
-    buildCommand: npm install --no-save extract-zip && node -e "require('extract-zip')('stocklens-ai-copilot-updated.zip',{dir:process.cwd()})" && npm install
+    buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
@@ -21,7 +21,7 @@ services:
   - type: cron
     name: stocklens-market-pulse
     runtime: node
-    buildCommand: npm install --no-save extract-zip && node -e "require('extract-zip')('stocklens-ai-copilot-updated.zip',{dir:process.cwd()})" && npm install
+    buildCommand: npm install
     startCommand: npm run cron:market-pulse
     schedule: "30 1 * * 1-5"
     envVars:
