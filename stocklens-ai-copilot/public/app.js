@@ -4,7 +4,8 @@ const I18N = {
     "nav.section":"เมนูหลัก","nav.dashboard":"ภาพรวมตลาด","nav.stocks":"หุ้น / วิเคราะห์","nav.portfolio":"พอร์ตหุ้น","nav.watchlist":"รายการติดตาม","nav.alerts":"แจ้งเตือนราคา","nav.copilot":"Stock Co-Pilot","nav.profile":"โปรไฟล์","nav.settings":"ตั้งค่า","nav.dataNote":"ข้อมูลขึ้นอยู่กับสิทธิ์ API และตลาด",
     "topbar.eyebrow":"EQUITY RESEARCH PLATFORM","topbar.connected":"เชื่อมต่อบริการ","page.dashboard":"ภาพรวมตลาด","page.stocks":"หุ้น / วิเคราะห์","page.portfolio":"พอร์ตหุ้น","page.watchlist":"รายการติดตาม","page.alerts":"แจ้งเตือนราคา","page.copilot":"Stock Co-Pilot","page.profile":"โปรไฟล์","page.settings":"ตั้งค่า",
     "profile.defaultName":"โปรไฟล์","dashboard.eyebrow":"RESEARCH WITH CONTEXT","dashboard.heroFirst":"เข้าใจธุรกิจ","dashboard.heroSecond":"ก่อนตัดสินใจลงทุน","dashboard.heroDescription":"ดูภาพรวมตลาด ติดตามหุ้น และตรวจผลการลงทุนจากข้อมูลในที่เดียว","dashboard.explore":"เริ่มวิเคราะห์หุ้น",
-    "pulse.title":"ภาพรวมตลาดประจำวัน","pulse.description":"สรุปจากราคา Finnhub, Gemini และประวัติที่บันทึกใน Neon","pulse.refresh":"โหลดข้อมูลล่าสุด","pulse.loadingDate":"กำลังโหลด…","pulse.connecting":"กำลังเชื่อมต่อ Neon","pulse.loading":"กำลังโหลดสรุปตลาดล่าสุด","pulse.loadingPrices":"กำลังโหลดข้อมูลราคา…","pulse.footnote":"ข้อมูลเป็น snapshot ตามเวลาที่ cron ทำงาน ไม่ใช่ราคาสด",
+    "pulse.title":"ภาพรวมตลาดประจำวัน","pulse.description":"ราคาและการเปลี่ยนแปลงของหุ้นกับ ETF ที่ติดตาม","pulse.refresh":"อัปเดตตลาด","pulse.loadingDate":"กำลังโหลด…","pulse.connecting":"กำลังโหลดตลาด","pulse.loading":"กำลังโหลดสรุปตลาดล่าสุด","pulse.loadingPrices":"กำลังโหลดข้อมูลราคา…","pulse.refreshing":"กำลังอัปเดตราคาและสรุปตลาด","pulse.manualDone":"อัปเดตแล้ว","pulse.cronDone":"ข้อมูลจากรอบล่าสุด","pulse.runFailed":"อัปเดตไม่สำเร็จ","pulse.noRun":"ยังไม่มีรอบอัปเดต","pulse.pricesFor":"ข้อมูลวันที่","pulse.noBrief":"ยังไม่มีข้อมูลตลาด","pulse.refreshPrompt":"กดอัปเดตตลาดเพื่อดึงราคาและสร้างสรุป","pulse.noPrices":"ยังไม่มีราคาให้แสดง","pulse.errorTitle":"โหลดภาพรวมตลาดไม่ได้","pulse.checkServices":"ตรวจ Finnhub และการเชื่อมต่อ Neon แล้วลองอีกครั้ง",
+    "news.title":"ข่าวที่มีผลต่อตลาด","news.refresh":"อัปเดตข่าว","news.loading":"กำลังโหลดข่าวตลาด…","news.empty":"ยังไม่มีข่าวสำคัญในช่วงนี้","news.error":"โหลดข่าวตลาดไม่ได้","news.highImpact":"ประเด็นมหภาค","news.companyImpact":"ข่าวบริษัท","news.marketWatch":"ติดตามตลาด","news.topic.rates":"ดอกเบี้ย","news.topic.inflation":"เงินเฟ้อ","news.topic.economy":"เศรษฐกิจ","news.topic.trade":"การค้า/นโยบาย","news.topic.energy":"พลังงาน/ภูมิรัฐศาสตร์","news.topic.company":"บริษัท",
     "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"ค้นหาและวิเคราะห์หุ้น","stocks.description":"เลือกราคา ดูผลต่างวันนี้และตั้งแต่ต้นปี พร้อมกราฟย้อนหลังของหุ้นตัวเดียวกัน","stocks.searchPlaceholder":"ค้นหา Ticker เช่น AAPL, MSFT","stocks.search":"ค้นหา","stocks.popular":"หุ้นยอดนิยม","stocks.company":"COMPANY OVERVIEW",
     "stock.lastPrice":"ราคาล่าสุด","stock.today":"เปลี่ยนแปลงวันนี้","stock.ytd":"เปลี่ยนแปลงปีนี้ (YTD)","stock.todayHint":"เทียบราคาปิดวันก่อน","stock.ytdHint":"เทียบราคาปิดสิ้นปีก่อน","stock.marketCap":"มูลค่าตลาด","stock.marketCapHint":"หน่วยตามแหล่งข้อมูล","stock.peHint":"ราคาต่อกำไร","stock.roeHint":"ผลตอบแทนต่อส่วนผู้ถือหุ้น","stock.metricsTitle":"ตัวชี้วัดทางการเงิน","stock.netMargin":"อัตรากำไรสุทธิ","stock.revenueGrowth":"การเติบโตรายได้ YoY","stock.dividend":"อัตราผลตอบแทนเงินปันผล","stock.metricsFootnote":"ข้อมูลบางรายการขึ้นอยู่กับแพ็กเกจ API และอาจไม่มีสำหรับทุกบริษัท","stock.analysisTitle":"ข้อสังเกตเบื้องต้น","stock.analysisEmpty":"เลือกหุ้นเพื่อดูข้อสังเกตจากตัวชี้วัด","stock.analysisNote":"ไม่ใช่คำแนะนำการลงทุน","stock.dataNote":"ข้อมูลขึ้นอยู่กับสิทธิ์และความพร้อมใช้งานของผู้ให้บริการ",
     "chart.title":"กราฟราคาย้อนหลัง","chart.emptyCaption":"เลือกหุ้นเพื่อดูกราฟรายวัน","chart.rangeLabel":"ช่วงเวลากราฟ","chart.oneMonth":"1 เดือน","chart.threeMonths":"3 เดือน","chart.sixMonths":"6 เดือน","chart.oneYear":"1 ปี","chart.load":"โหลดกราฟ","chart.placeholder":"กราฟจะแสดงหลังเลือกหุ้น","chart.legend":"● ราคาปิดรายวัน","chart.export":"ส่งออก CSV",
@@ -14,7 +15,7 @@ const I18N = {
     "alerts.title":"แจ้งเตือนราคา","alerts.description":"ติดตามระดับราคาที่คุณกำหนด","alerts.note":"ระบบตรวจราคาเมื่อเปิดหน้าเว็บนี้","alerts.symbolPlaceholder":"Ticker","alerts.above":"ราคาสูงกว่าหรือเท่ากับ","alerts.below":"ราคาต่ำกว่าหรือเท่ากับ","alerts.targetPlaceholder":"ราคาเป้าหมาย","alerts.add":"ตั้งแจ้งเตือน","alerts.empty":"ยังไม่มีการแจ้งเตือน","alerts.saved":"บันทึกแจ้งเตือนแล้ว","alerts.invalid":"กรอก Ticker และราคาเป้าหมายให้ถูกต้อง","alerts.limit":"ตั้งแจ้งเตือนได้สูงสุด 10 รายการ","alerts.hit":"ราคาถึงเป้าหมายแล้ว","alerts.waiting":"รอตรวจสอบ",
     "copilot.description":"ถามเรื่องธุรกิจ งบการเงิน และความเสี่ยง","copilot.prompt":"ถามเรื่องธุรกิจ งบการเงิน ความเสี่ยง หรือให้ช่วยอธิบายหุ้น","copilot.greeting":"สวัสดีครับ ผมช่วยอธิบายข้อมูลหุ้นและประเด็นที่ควรศึกษาต่อได้ หากไม่มีข้อมูลตลาดแนบมา ผมจะแจ้งให้ทราบแทนการเดาตัวเลข","copilot.placeholder":"ถาม Stock Co-Pilot…","copilot.send":"ส่งคำถาม ↗","copilot.footnote":"AI อาจผิดพลาด · ไม่ใช่คำแนะนำซื้อขาย · อย่าใส่ API Key ในช่องแชต",
     "profile.title":"โปรไฟล์","profile.description":"ตั้งชื่อโปรไฟล์ที่แสดงบนอุปกรณ์นี้","profile.name":"ชื่อที่แสดง","profile.namePlaceholder":"ชื่อของคุณ","profile.email":"อีเมล (ไม่บังคับ)","profile.localProfile":"โปรไฟล์ในอุปกรณ์นี้","profile.privateTitle":"ข้อมูลส่วนตัว","profile.privateNote":"โปรไฟล์นี้บันทึกไว้ในเบราว์เซอร์ของอุปกรณ์นี้เท่านั้น ยังไม่มีระบบบัญชีหรือซิงก์ข้ามอุปกรณ์","profile.saved":"บันทึกโปรไฟล์แล้ว",
-    "settings.title":"ตั้งค่า","settings.description":"ปรับภาษาและรูปแบบหน้าจอ","settings.language":"ภาษา","settings.languageNote":"เลือกภาษาของเมนูและข้อความในระบบ","settings.theme":"ธีม","settings.themeNote":"เลือกโหมดสว่างหรือโหมดมืด","settings.dark":"มืด","settings.light":"สว่าง","settings.savedLocally":"การตั้งค่าจะบันทึกในเบราว์เซอร์ของอุปกรณ์นี้",
+    "settings.title":"ตั้งค่า","settings.description":"ภาษา ธีม และสถานะบริการ","settings.language":"ภาษา","settings.languageNote":"เลือกภาษาของเมนูและข้อความในระบบ","settings.theme":"ธีม","settings.themeNote":"เลือกโหมดสว่างหรือโหมดมืด","settings.dark":"มืด","settings.light":"สว่าง","settings.savedLocally":"การตั้งค่าจะบันทึกในเบราว์เซอร์ของอุปกรณ์นี้","settings.serviceStatus":"สถานะบริการ","settings.serviceLoading":"กำลังตรวจบริการ","settings.configured":"ตั้งค่าแล้ว","settings.missingKey":"ยังไม่มี API Key","settings.connected":"เชื่อมต่อแล้ว","settings.missingUrl":"ยังไม่มี URL","settings.unavailable":"เชื่อมต่อไม่ได้","settings.allReady":"บริการพร้อมใช้งาน","settings.needsSetup":"มีบริการที่ต้องตั้งค่า","settings.statusUnavailable":"ตรวจสถานะไม่ได้",
     "common.add":"เพิ่ม","common.save":"บันทึก","common.cancel":"ยกเลิก","common.delete":"ลบ","common.noData":"ไม่มีข้อมูล","common.searchFirst":"กรุณาค้นหาหุ้นก่อน","common.invalidSymbol":"กรุณากรอก Ticker ให้ถูกต้อง","common.loading":"กำลังโหลด…","footer.disclaimer":"ข้อมูลเพื่อการศึกษา · ไม่ใช่คำแนะนำการลงทุน"
   },
   en: {
@@ -22,7 +23,8 @@ const I18N = {
     "nav.section":"MAIN MENU","nav.dashboard":"Market overview","nav.stocks":"Stocks / Research","nav.portfolio":"Portfolio","nav.watchlist":"Watchlist","nav.alerts":"Price alerts","nav.copilot":"Stock Co-Pilot","nav.profile":"Profile","nav.settings":"Settings","nav.dataNote":"Coverage depends on API access and market",
     "topbar.eyebrow":"EQUITY RESEARCH PLATFORM","topbar.connected":"Services connected","page.dashboard":"Market overview","page.stocks":"Stocks / Research","page.portfolio":"Portfolio","page.watchlist":"Watchlist","page.alerts":"Price alerts","page.copilot":"Stock Co-Pilot","page.profile":"Profile","page.settings":"Settings",
     "profile.defaultName":"Profile","dashboard.eyebrow":"RESEARCH WITH CONTEXT","dashboard.heroFirst":"Understand the business","dashboard.heroSecond":"before you invest","dashboard.heroDescription":"Review markets, follow stocks, and track investment performance in one place.","dashboard.explore":"Start stock research",
-    "pulse.title":"Daily market overview","pulse.description":"Finnhub prices summarized by Gemini and stored in Neon","pulse.refresh":"Refresh latest data","pulse.loadingDate":"Loading…","pulse.connecting":"Connecting to Neon","pulse.loading":"Loading the latest market brief","pulse.loadingPrices":"Loading prices…","pulse.footnote":"Snapshot captured when the scheduled job ran; not a live quote.",
+    "pulse.title":"Daily market overview","pulse.description":"Prices and daily moves for followed stocks and ETFs","pulse.refresh":"Refresh market","pulse.loadingDate":"Loading…","pulse.connecting":"Loading market data","pulse.loading":"Loading the latest market brief","pulse.loadingPrices":"Loading prices…","pulse.refreshing":"Refreshing prices and market brief","pulse.manualDone":"Updated just now","pulse.cronDone":"Latest scheduled update","pulse.runFailed":"Update failed","pulse.noRun":"No update yet","pulse.pricesFor":"Prices for","pulse.noBrief":"No market data yet","pulse.refreshPrompt":"Refresh the market to fetch prices and create a summary","pulse.noPrices":"No prices to show yet","pulse.errorTitle":"Could not load market overview","pulse.checkServices":"Check Finnhub and Neon connectivity, then try again",
+    "news.title":"Market-moving news","news.refresh":"Refresh news","news.loading":"Loading market news…","news.empty":"No notable headlines found recently","news.error":"Could not load market news","news.highImpact":"Macro event","news.companyImpact":"Company news","news.marketWatch":"Market watch","news.topic.rates":"Interest rates","news.topic.inflation":"Inflation","news.topic.economy":"Economy","news.topic.trade":"Trade / policy","news.topic.energy":"Energy / geopolitics","news.topic.company":"Company",
     "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"Find and research stocks","stocks.description":"See today’s move, year-to-date return, and the selected stock’s price chart.","stocks.searchPlaceholder":"Search a ticker, such as AAPL or MSFT","stocks.search":"Search","stocks.popular":"Popular stocks","stocks.company":"COMPANY OVERVIEW",
     "stock.lastPrice":"Latest price","stock.today":"Today’s change","stock.ytd":"Year-to-date change","stock.todayHint":"Compared with the prior close","stock.ytdHint":"Compared with the prior year close","stock.marketCap":"Market cap","stock.marketCapHint":"Units from data source","stock.peHint":"Price to earnings","stock.roeHint":"Return on equity","stock.metricsTitle":"Financial metrics","stock.netMargin":"Net profit margin","stock.revenueGrowth":"Revenue growth YoY","stock.dividend":"Dividend yield","stock.metricsFootnote":"Metric coverage depends on the API plan and company","stock.analysisTitle":"Initial observations","stock.analysisEmpty":"Select a stock to see metric observations","stock.analysisNote":"Not investment advice","stock.dataNote":"Data depends on provider access and availability",
     "chart.title":"Historical price chart","chart.emptyCaption":"Select a stock to see daily prices","chart.rangeLabel":"Chart range","chart.oneMonth":"1 month","chart.threeMonths":"3 months","chart.sixMonths":"6 months","chart.oneYear":"1 year","chart.load":"Load chart","chart.placeholder":"The chart appears after you select a stock","chart.legend":"● Daily close","chart.export":"Export CSV",
@@ -32,7 +34,7 @@ const I18N = {
     "alerts.title":"Price alerts","alerts.description":"Track price levels you choose.","alerts.note":"Prices are checked when you open this page.","alerts.symbolPlaceholder":"Ticker","alerts.above":"At or above","alerts.below":"At or below","alerts.targetPlaceholder":"Target price","alerts.add":"Create alert","alerts.empty":"No alerts yet","alerts.saved":"Price alert saved","alerts.invalid":"Enter a valid ticker and target price","alerts.limit":"You can create up to 10 alerts","alerts.hit":"Target price reached","alerts.waiting":"Waiting",
     "copilot.description":"Ask about businesses, financials, and risk","copilot.prompt":"Ask about a business, financial statements, risk, or a stock","copilot.greeting":"Hello. I can explain stock data and topics to research. If market data is not attached, I’ll say so instead of guessing numbers.","copilot.placeholder":"Ask Stock Co-Pilot…","copilot.send":"Send ↗","copilot.footnote":"AI can make mistakes · Not investment advice · Never enter an API key in chat",
     "profile.title":"Profile","profile.description":"Set the profile name shown on this device.","profile.name":"Display name","profile.namePlaceholder":"Your name","profile.email":"Email (optional)","profile.localProfile":"Profile on this device","profile.privateTitle":"Your information","profile.privateNote":"This profile is saved only in this browser. There is no account system or cross-device sync yet.","profile.saved":"Profile saved",
-    "settings.title":"Settings","settings.description":"Choose your language and appearance.","settings.language":"Language","settings.languageNote":"Choose the language used in menus and interface text.","settings.theme":"Theme","settings.themeNote":"Choose light or dark appearance.","settings.dark":"Dark","settings.light":"Light","settings.savedLocally":"Preferences are saved in this browser.",
+    "settings.title":"Settings","settings.description":"Language, appearance, and service status","settings.language":"Language","settings.languageNote":"Choose the language used in menus and interface text.","settings.theme":"Theme","settings.themeNote":"Choose light or dark appearance.","settings.dark":"Dark","settings.light":"Light","settings.savedLocally":"Preferences are saved in this browser.","settings.serviceStatus":"Service status","settings.serviceLoading":"Checking services","settings.configured":"Configured","settings.missingKey":"API key missing","settings.connected":"Connected","settings.missingUrl":"URL missing","settings.unavailable":"Unavailable","settings.allReady":"All services ready","settings.needsSetup":"Setup required","settings.statusUnavailable":"Status unavailable",
     "common.add":"Add","common.save":"Save","common.cancel":"Cancel","common.delete":"Remove","common.noData":"No data","common.searchFirst":"Search for a stock first","common.invalidSymbol":"Enter a valid ticker","common.loading":"Loading…","footer.disclaimer":"For research only · Not investment advice"
   }
 };
@@ -219,9 +221,6 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
     p.textContent = analysisR.status === "rejected" ? analysisR.reason.message : currentLanguage === "en" ? "Not enough data to summarize yet" : "ยังไม่มีข้อมูลเพียงพอสำหรับสรุป";
     analysisBox.append(p);
   }
-  $("data-note").querySelector("span").textContent = currentLanguage === "en"
-    ? `Finnhub data · Retrieved ${new Date().toLocaleString()} · Delays and coverage depend on the API plan.`
-    : `Finnhub · ดึงข้อมูลเมื่อ ${new Date().toLocaleString()} · ความล่าช้าและความครอบคลุมขึ้นอยู่กับแผน API`;
   if (!quote && !profile && !metrics) toast(currentLanguage === "en" ? "Could not load stock data. Check the API key, plan access, and ticker." : "โหลดข้อมูลไม่สำเร็จ: ตรวจ API Key, สิทธิ์แผน และ Ticker");
 }
 if (window.lucide) window.lucide.createIcons();
@@ -746,6 +745,8 @@ $("setting-language")?.addEventListener("change", event => {
   renderWatchlist(); renderAlerts(); void renderPortfolio(); renderProfile();
   if (activeSymbol) void loadStock(activeSymbol, { preservePage: true });
   void loadMarketPulse();
+  renderMarketNews(cachedMarketNews);
+  renderIntegrationStatus(cachedIntegrationStatus);
 });
 
 function readProfile() {
@@ -782,44 +783,46 @@ $("profile-form")?.addEventListener("submit", event => {
 });
 
 function formatPulseDate(value) {
-  if (!value) return "ยังไม่มีข้อมูลตามรอบเวลา";
+  if (!value) return t("pulse.noRun");
   const dateText = String(value).slice(0, 10);
   const date = new Date(dateText + "T12:00:00Z");
   return Number.isNaN(date.getTime()) ? dateText : date.toLocaleDateString(currentLanguage === "en" ? "en-US" : "th-TH", { dateStyle: "long", timeZone: "Asia/Bangkok" });
 }
 
-async function loadMarketPulse() {
-  const refresh = $("pulse-refresh");
+async function loadMarketPulse(options = {}) {
+  const isRefresh = options.refresh === true;
+  const button = $("pulse-refresh");
   const summary = $("pulse-summary");
   const snapshots = $("pulse-snapshots");
-  const en = currentLanguage === "en";
-  refresh.disabled = true;
+  const status = $("pulse-status");
+  button.disabled = true;
+  if (isRefresh) {
+    status.className = "pulse-status pending";
+    status.textContent = t("pulse.refreshing");
+    status.dataset.dynamic = "true";
+  }
   try {
-    const data = await api("/api/market-pulse");
+    const data = await api(isRefresh ? "/api/market-pulse/refresh" : "/api/market-pulse", isRefresh ? { method: "POST" } : {});
     const run = data.lastRun;
-    const status = $("pulse-status");
     status.className = "pulse-status " + (run?.status === "succeeded" ? "success" : run?.status === "failed" ? "failed" : "pending");
     status.textContent = run?.status === "succeeded"
-      ? (en ? "Cron succeeded · " : "Cron สำเร็จ · ") + (run.finished_at ? new Date(run.finished_at).toLocaleString(en ? "en-US" : "th-TH", { timeZone: "Asia/Bangkok" }) : "")
-      : run?.status === "failed" ? (en ? "Latest cron run failed" : "Cron รอบล่าสุดไม่สำเร็จ") : (en ? "No cron history" : "ยังไม่พบประวัติ Cron");
+      ? (run.details?.trigger === "manual" ? t("pulse.manualDone") : t("pulse.cronDone"))
+      : run?.status === "failed" ? t("pulse.runFailed") : t("pulse.noRun");
 
     if (!data.available || !data.brief) {
       $("pulse-date").textContent = data.snapshotDate
-        ? (en ? "Prices for " : "ข้อมูลราคาวันที่ ") + formatPulseDate(data.snapshotDate)
-        : (en ? "No market brief yet" : "ยังไม่มีสรุปตลาด");
+        ? t("pulse.pricesFor") + " " + formatPulseDate(data.snapshotDate)
+        : t("pulse.noBrief");
       summary.textContent = run?.status === "failed"
-        ? (en ? `Cron failed: ${run.error || "Check Render logs for stocklens-market-pulse."}` : `Cron ทำงานไม่สำเร็จ: ${run.error || "เปิด Render Logs ของ stocklens-market-pulse เพื่อตรวจสาเหตุ"}`)
-        : data.snapshots?.length
-          ? (en ? "Price snapshots are available, but today’s Gemini brief is missing." : "มี snapshot ราคาแล้ว แต่ยังไม่มีสรุป Gemini สำหรับวันนี้")
-          : (en ? "No cron run was found. Check the stocklens-market-pulse service and its FINNHUB_API_KEY, GEMINI_API_KEY, and DATABASE_URL settings." : "ยังไม่พบประวัติการรัน Cron ตรวจว่า Render มี service stocklens-market-pulse และตั้ง FINNHUB_API_KEY, GEMINI_API_KEY, DATABASE_URL ไว้ใน service นี้ครบแล้ว");
-      $("pulse-model").textContent = "";
+        ? t("pulse.runFailed") + ": " + (run.error || t("pulse.checkServices"))
+        : t("pulse.refreshPrompt");
     } else {
-      $("pulse-date").textContent = (en ? "Data for " : "ข้อมูลวันที่ ") + formatPulseDate(data.brief.as_of_date);
+      $("pulse-date").textContent = t("pulse.pricesFor") + " " + formatPulseDate(data.brief.as_of_date);
       summary.textContent = data.brief.summary;
-      $("pulse-model").textContent = data.brief.symbols_count + " Ticker · " + data.brief.model + (en ? " · generated " : " · สร้างเมื่อ ") + new Date(data.brief.generated_at).toLocaleString(en ? "en-US" : "th-TH", { timeZone: "Asia/Bangkok" });
     }
 
     snapshots.replaceChildren();
+    const en = currentLanguage === "en";
     for (const item of data.snapshots || []) {
       const card = document.createElement("article");
       card.className = "pulse-ticker";
@@ -842,44 +845,151 @@ async function loadMarketPulse() {
       snapshots.append(card);
     }
     if (!snapshots.childElementCount) {
-      const empty = document.createElement("div"); empty.className = "empty-state";
-      empty.textContent = run?.status === "failed"
-        ? (en ? "Cron did not save prices. Check the service error and environment." : "Cron ไม่ได้บันทึกราคา ตรวจข้อความ error และ Environment ของ service")
-        : (en ? "Price data will appear after a successful cron run." : "ข้อมูลราคาจะปรากฏหลัง cron ทำงานสำเร็จ");
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.textContent = t("pulse.noPrices");
       snapshots.append(empty);
     }
-    for (const id of ["pulse-date", "pulse-status", "pulse-summary", "pulse-model"]) $(id).dataset.dynamic = "true";
+    for (const id of ["pulse-date", "pulse-status", "pulse-summary"]) $(id).dataset.dynamic = "true";
   } catch (error) {
-    $("pulse-date").textContent = en ? "Could not read market data" : "อ่านข้อมูลตลาดไม่สำเร็จ";
-    $("pulse-status").className = "pulse-status failed";
-    $("pulse-status").textContent = error.message || "เชื่อมต่อ Neon ไม่สำเร็จ";
-    summary.textContent = en ? "Check DATABASE_URL and the Neon connection, then try again." : "ตรวจ DATABASE_URL และการเชื่อมต่อ Neon แล้วลองโหลดใหม่";
+    $("pulse-date").textContent = t("pulse.errorTitle");
+    status.className = "pulse-status failed";
+    status.textContent = error.message || t("pulse.errorTitle");
+    summary.textContent = t("pulse.checkServices");
     snapshots.replaceChildren();
-    for (const id of ["pulse-date", "pulse-status", "pulse-summary", "pulse-model"]) $(id).dataset.dynamic = "true";
+    for (const id of ["pulse-date", "pulse-status", "pulse-summary"]) $(id).dataset.dynamic = "true";
   } finally {
-    refresh.disabled = false;
+    button.disabled = false;
   }
 }
 
-$("pulse-refresh")?.addEventListener("click", loadMarketPulse);
+$("pulse-refresh")?.addEventListener("click", () => loadMarketPulse({ refresh: true }));
 loadMarketPulse();
+
+function formatNewsTime(timestamp) {
+  const date = new Date(Number(timestamp) * 1000);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString(currentLanguage === "en" ? "en-US" : "th-TH", {
+    timeZone: "Asia/Bangkok", dateStyle: "medium", timeStyle: "short"
+  });
+}
+
+let cachedMarketNews = null;
+function renderMarketNews(data) {
+  const host = $("news-list");
+  if (!host) return;
+  host.replaceChildren();
+  if (data?.error) {
+    const message = document.createElement("div");
+    message.className = "news-empty error";
+    message.textContent = data.error;
+    host.append(message);
+    return;
+  }
+  if (!data?.articles?.length) {
+    const empty = document.createElement("div");
+    empty.className = "news-empty";
+    empty.textContent = data ? t("news.empty") : t("news.loading");
+    host.append(empty);
+    return;
+  }
+  const impactText = { high: "news.highImpact", watch: "news.companyImpact", normal: "news.marketWatch" };
+  for (const item of data.articles) {
+    const card = document.createElement("article");
+    card.className = "news-item " + item.impact;
+    const heading = document.createElement("div");
+    heading.className = "news-item-heading";
+    const badge = document.createElement("span");
+    badge.className = "news-impact " + item.impact;
+    badge.textContent = t(impactText[item.impact] || impactText.normal);
+    heading.append(badge);
+    for (const topic of item.topics || []) {
+      const tag = document.createElement("span");
+      tag.className = "news-topic";
+      tag.textContent = t("news.topic." + topic);
+      heading.append(tag);
+    }
+    const link = document.createElement("a");
+    link.className = "news-title";
+    link.href = item.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = item.headline;
+    card.append(heading, link);
+    if (item.summary) {
+      const description = document.createElement("p");
+      description.textContent = item.summary;
+      card.append(description);
+    }
+    const meta = document.createElement("div");
+    meta.className = "news-meta-line";
+    const source = document.createElement("span");
+    source.textContent = item.source;
+    meta.append(source);
+    const timestamp = Number(item.datetime);
+    if (Number.isFinite(timestamp) && timestamp > 0) {
+      const time = document.createElement("time");
+      time.dateTime = new Date(timestamp * 1000).toISOString();
+      time.textContent = formatNewsTime(timestamp);
+      meta.append(time);
+    }
+    card.append(meta);
+    host.append(card);
+  }
+}
+
+async function loadMarketNews() {
+  const button = $("news-refresh");
+  if (!button) return;
+  button.disabled = true;
+  try {
+    cachedMarketNews = await api("/api/news");
+    renderMarketNews(cachedMarketNews);
+  } catch (error) {
+    cachedMarketNews = { error: error.message || t("news.error") };
+    renderMarketNews(cachedMarketNews);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+$("news-refresh")?.addEventListener("click", loadMarketNews);
+loadMarketNews();
+
+let cachedIntegrationStatus = null;
+function renderIntegrationStatus(data) {
+  if (!data) return;
+  if (data.error) {
+    $("integration-title").textContent = t("settings.statusUnavailable");
+    $("integration-dot").classList.add("offline");
+    for (const id of ["service-finnhub", "service-gemini", "service-neon"]) {
+      $(id).className = "service-chip offline";
+      $(id).textContent = $(id).id.replace("service-", "") + " · " + t("settings.statusUnavailable");
+    }
+    return;
+  }
+  const integrations = data.integrations || {};
+  const services = [
+    { id: "service-finnhub", name: "Finnhub", ready: integrations.finnhub, label: integrations.finnhub ? "settings.configured" : "settings.missingKey" },
+    { id: "service-gemini", name: "Gemini", ready: integrations.gemini, label: integrations.gemini ? "settings.configured" : "settings.missingKey" },
+    { id: "service-neon", name: "Neon", ready: integrations.neon === "connected", label: integrations.neon === "connected" ? "settings.connected" : integrations.neon === "not_configured" ? "settings.missingUrl" : "settings.unavailable" }
+  ];
+  services.forEach(service => {
+    const chip = $(service.id);
+    chip.className = "service-chip " + (service.ready ? "ready" : "offline");
+    chip.textContent = service.name + " · " + t(service.label);
+  });
+  const ready = services.every(service => service.ready);
+  $("integration-title").textContent = ready ? t("settings.allReady") : t("settings.needsSetup");
+  $("integration-dot").classList.toggle("offline", !ready);
+}
+
 async function loadIntegrationStatus() {
   try {
-    const data = await api("/api/health");
-    const integrations = data.integrations || {};
-    const configured = [
-      integrations.finnhub ? "Finnhub ตั้งค่าแล้ว" : "Finnhub ขาด key",
-      integrations.gemini ? "Gemini ตั้งค่าแล้ว" : "Gemini ขาด key",
-      integrations.neon === "connected" ? "Neon เชื่อมต่อแล้ว" : integrations.neon === "not_configured" ? "Neon ขาด URL" : "Neon เชื่อมต่อไม่ได้"
-    ];
-    const ready = Boolean(integrations.finnhub && integrations.gemini && integrations.neon === "connected");
-    $("integration-title").textContent = ready ? "ตั้งค่าบริการครบ" : "ตรวจสอบการตั้งค่า";
-    $("integration-list").textContent = configured.join(" · ");
-    $("integration-dot").classList.toggle("offline", !ready);
+    cachedIntegrationStatus = await api("/api/health");
   } catch {
-    $("integration-title").textContent = "ตรวจสถานะบริการไม่ได้";
-    $("integration-dot").classList.add("offline");
+    cachedIntegrationStatus = { error: true };
   }
+  renderIntegrationStatus(cachedIntegrationStatus);
 }
 loadIntegrationStatus();
 

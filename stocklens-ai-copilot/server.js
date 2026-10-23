@@ -4,6 +4,7 @@ const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
 const { databaseConfigured, ensureSchema, query } = require("./db");
+const { runMarketPulse } = require("./scripts/market-pulse");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -35,15 +36,15 @@ function validSymbol(value) {
 
 function cached(key) {
   const item = cache.get(key);
-  if (!item || Date.now() - item.savedAt > CACHE_TTL_MS) {
+  if (!item || Date.now() - item.savedAt > (item.ttl || CACHE_TTL_MS)) {
     cache.delete(key);
     return null;
   }
   return item.value;
 }
 
-function setCache(key, value) {
-  cache.set(key, { value, savedAt: Date.now() });
+function setCache(key, value, ttl = CACHE_TTL_MS) {
+  cache.set(key, { value, savedAt: Date.now(), ttl });
 }
 
 function parseFinnhubCandles(payload) {
@@ -129,47 +130,113 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 
+async function readMarketPulse() {
+  if (!databaseConfigured()) throw new Error("กรุณาตั้ง DATABASE_URL เพื่อเชื่อมต่อ Neon");
+  await ensureSchema();
+  const briefResult = await query(
+    `SELECT as_of_date, summary, model, symbols_count, generated_at
+     FROM market_briefs ORDER BY as_of_date DESC LIMIT 1`
+  );
+  const brief = briefResult.rows[0] || null;
+  const snapshotsResult = brief
+    ? await query(
+        `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
+                day_open, previous_close, quote_time, captured_at
+         FROM market_snapshots WHERE as_of_date = $1 ORDER BY symbol`,
+        [brief.as_of_date]
+      )
+    : await query(
+        `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
+                day_open, previous_close, quote_time, captured_at
+         FROM market_snapshots
+         WHERE as_of_date = (SELECT MAX(as_of_date) FROM market_snapshots)
+         ORDER BY symbol`
+      );
+  const runResult = await query(
+    `SELECT status, started_at, finished_at, error, details
+     FROM cron_runs WHERE job_name = 'market-pulse'
+     ORDER BY started_at DESC LIMIT 1`
+  );
+  const snapshots = snapshotsResult.rows;
+  return {
+    available: Boolean(brief), brief, snapshots,
+    snapshotDate: brief?.as_of_date || snapshots[0]?.as_of_date || null,
+    lastRun: runResult.rows[0] || null
+  };
+}
+
 app.get("/api/market-pulse", async (_req, res) => {
   if (!databaseConfigured()) {
     return res.status(503).json({ error: "กรุณาตั้ง DATABASE_URL เพื่อเชื่อมต่อ Neon" });
   }
   try {
-    await ensureSchema();
-    const briefResult = await query(
-      `SELECT as_of_date, summary, model, symbols_count, generated_at
-       FROM market_briefs ORDER BY as_of_date DESC LIMIT 1`
-    );
-    const brief = briefResult.rows[0] || null;
-    const snapshotsResult = brief
-      ? await query(
-          `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
-                  day_open, previous_close, quote_time, captured_at
-           FROM market_snapshots WHERE as_of_date = $1 ORDER BY symbol`,
-          [brief.as_of_date]
-        )
-      : await query(
-          `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
-                  day_open, previous_close, quote_time, captured_at
-           FROM market_snapshots
-           WHERE as_of_date = (SELECT MAX(as_of_date) FROM market_snapshots)
-           ORDER BY symbol`
-        );
-    const runResult = await query(
-      `SELECT status, started_at, finished_at, error
-       FROM cron_runs WHERE job_name = 'market-pulse'
-       ORDER BY started_at DESC LIMIT 1`
-    );
-    const snapshots = snapshotsResult.rows;
-    res.json({
-      available: Boolean(brief),
-      brief,
-      snapshots,
-      snapshotDate: brief?.as_of_date || snapshots[0]?.as_of_date || null,
-      lastRun: runResult.rows[0] || null
-    });
+    res.json(await readMarketPulse());
   } catch (error) {
     console.error("Market pulse error:", error.message);
     res.status(503).json({ error: "อ่านสรุปตลาดจาก Neon ไม่สำเร็จ กรุณาตรวจการตั้งค่า DATABASE_URL" });
+  }
+});
+
+let marketPulseRefresh = null;
+app.post("/api/market-pulse/refresh", async (_req, res) => {
+  if (!databaseConfigured()) return res.status(503).json({ error: "กรุณาตั้ง DATABASE_URL เพื่อเชื่อมต่อ Neon" });
+  if (!process.env.FINNHUB_API_KEY) return res.status(503).json({ error: "กรุณาตั้ง FINNHUB_API_KEY ใน Environment ของ Web Service" });
+  try {
+    if (!marketPulseRefresh) {
+      marketPulseRefresh = runMarketPulse({ trigger: "manual" }).finally(() => { marketPulseRefresh = null; });
+    }
+    await marketPulseRefresh;
+    res.json(await readMarketPulse());
+  } catch (error) {
+    console.error("Manual market pulse failed:", error.message);
+    res.status(502).json({ error: error.message || "อัปเดตภาพรวมตลาดไม่สำเร็จ" });
+  }
+});
+
+const NEWS_IMPACT_RULES = [
+  { label: "rates", pattern: /\b(fed|fomc|federal reserve|interest rate|rate cut|rate hike|central bank|monetary policy)\b|เฟด|ดอกเบี้ย|ธนาคารกลาง/i },
+  { label: "inflation", pattern: /\b(inflation|cpi|pce|consumer price|producer price)\b|เงินเฟ้อ/i },
+  { label: "economy", pattern: /\b(payrolls?|unemployment|jobs report|nonfarm|gdp|recession)\b|การจ้างงาน|ว่างงาน|จีดีพี|เศรษฐกิจถดถอย/i },
+  { label: "trade", pattern: /\b(tariff|trade war|sanction|export ban|shutdown|debt ceiling)\b|ภาษีนำเข้า|สงครามการค้า|คว่ำบาตร/i },
+  { label: "energy", pattern: /\b(war|missile|conflict|oil price|opec|crude|strait of hormuz)\b|สงคราม|น้ำมัน|ภูมิรัฐศาสตร์/i },
+  { label: "company", pattern: /\b(earnings|profit warning|guidance|merger|acquisition|bankruptcy|layoffs)\b|ผลประกอบการ|ควบรวม|ล้มละลาย|เลิกจ้าง/i }
+];
+
+function scoreNewsImpact(article) {
+  const text = (String(article.headline || "") + " " + String(article.summary || "")).slice(0, 2400);
+  const topics = NEWS_IMPACT_RULES.filter(rule => rule.pattern.test(text)).map(rule => rule.label);
+  const macroHits = topics.filter(topic => topic !== "company").length;
+  return { impact: macroHits > 0 ? "high" : topics.length ? "watch" : "normal", topics };
+}
+
+app.get("/api/news", async (_req, res) => {
+  if (!process.env.FINNHUB_API_KEY) return res.status(503).json({ error: "กรุณาตั้ง FINNHUB_API_KEY เพื่อโหลดข่าวตลาด" });
+  const saved = cached("market-news:general");
+  if (saved) return res.json(saved);
+  try {
+    const url = new URL("https://finnhub.io/api/v1/news");
+    url.searchParams.set("category", "general");
+    url.searchParams.set("token", process.env.FINNHUB_API_KEY);
+    const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+    if (!response.ok) throw new Error(response.status === 429 ? "Finnhub news rate limit reached" : "Finnhub news returned " + response.status);
+    const payload = await response.json();
+    if (!Array.isArray(payload)) throw new Error("Finnhub returned an invalid news response");
+    const cutoff = Math.floor(Date.now() / 1000) - 7 * 86400;
+    const articles = payload
+      .filter(item => item && item.headline && Number.isFinite(Number(item.datetime)) && Number(item.datetime) >= cutoff && /^https?:\/\//i.test(String(item.url || "")))
+      .map(item => ({
+        id: String(item.id || item.url), headline: String(item.headline).slice(0, 240),
+        summary: String(item.summary || "").slice(0, 320), source: String(item.source || "Finnhub").slice(0, 80),
+        url: item.url, datetime: Number(item.datetime), ...scoreNewsImpact(item)
+      }))
+      .sort((a, b) => (a.impact === "high" ? 0 : a.impact === "watch" ? 1 : 2) - (b.impact === "high" ? 0 : b.impact === "watch" ? 1 : 2) || b.datetime - a.datetime)
+      .slice(0, 8);
+    const result = { articles, source: "Finnhub" };
+    setCache("market-news:general", result, 5 * 60_000);
+    res.json(result);
+  } catch (error) {
+    console.error("Market news error:", error.message);
+    res.status(502).json({ error: error.message || "โหลดข่าวตลาดไม่สำเร็จ" });
   }
 });
 
