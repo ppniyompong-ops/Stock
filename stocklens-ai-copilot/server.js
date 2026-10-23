@@ -46,6 +46,66 @@ function setCache(key, value) {
   cache.set(key, { value, savedAt: Date.now() });
 }
 
+function parseFinnhubCandles(payload) {
+  if (payload?.s !== "ok" || !Array.isArray(payload.t) || !Array.isArray(payload.c)) return [];
+  return payload.t.map((time, index) => ({
+    time: Number(time) * 1000,
+    close: Number(payload.c[index]),
+    high: Number(payload.h?.[index]),
+    low: Number(payload.l?.[index]),
+    open: Number(payload.o?.[index]),
+    volume: Number(payload.v?.[index])
+  })).filter((item, index) => payload.c[index] != null && Number.isFinite(item.time) && Number.isFinite(item.close));
+}
+
+async function fetchFinnhubCandles(symbol, from, to, key) {
+  const url = new URL("https://finnhub.io/api/v1/stock/candle");
+  url.searchParams.set("symbol", symbol);
+  url.searchParams.set("resolution", "D");
+  url.searchParams.set("from", String(from));
+  url.searchParams.set("to", String(to));
+  url.searchParams.set("token", key);
+  const response = await fetch(url, { signal: AbortSignal.timeout(12000) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(`Finnhub returned HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  const candles = parseFinnhubCandles(payload);
+  if (!candles.length) throw new Error(payload.s === "no_data" ? "Finnhub returned no candles" : "Finnhub returned invalid candles");
+  return candles;
+}
+
+async function fetchYahooCandles(symbol, from, to) {
+  // Yahoo Finance uses hyphens for share classes (for example BRK-B).
+  const yahooSymbol = symbol.replace(/\./g, "-");
+  const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}`);
+  url.searchParams.set("period1", String(from));
+  url.searchParams.set("period2", String(to));
+  url.searchParams.set("interval", "1d");
+  const response = await fetch(url, {
+    headers: { Accept: "application/json", "User-Agent": "Mozilla/5.0 StockLensAI/2.0" },
+    signal: AbortSignal.timeout(12000)
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(`Yahoo Finance returned HTTP ${response.status}`);
+  if (payload.chart?.error) throw new Error(payload.chart.error.description || "Yahoo Finance rejected the ticker");
+  const result = payload.chart?.result?.[0];
+  const quote = result?.indicators?.quote?.[0];
+  if (!Array.isArray(result?.timestamp) || !Array.isArray(quote?.close)) throw new Error("Yahoo Finance returned no daily history");
+  const candles = result.timestamp.map((time, index) => ({
+    time: Number(time) * 1000,
+    close: Number(quote.close[index]),
+    high: Number(quote.high?.[index]),
+    low: Number(quote.low?.[index]),
+    open: Number(quote.open?.[index]),
+    volume: Number(quote.volume?.[index])
+  })).filter((item, index) => quote.close[index] != null && Number.isFinite(item.time) && Number.isFinite(item.close));
+  if (!candles.length) throw new Error("Yahoo Finance returned no usable daily history");
+  return candles;
+}
+
 app.get("/api/health", async (_req, res) => {
   let neon = databaseConfigured() ? "unavailable" : "not_configured";
   if (databaseConfigured()) {
@@ -149,45 +209,38 @@ app.get("/api/candles/:symbol", async (req, res) => {
   const symbol = String(req.params.symbol || "").trim().toUpperCase();
   if (!validSymbol(symbol)) return res.status(400).json({ error: "Ticker ไม่ถูกต้อง" });
   const key = process.env.FINNHUB_API_KEY;
-  if (!key) return res.status(503).json({ error: "ยังไม่ได้ตั้งค่า Finnhub API Key" });
   const days = Math.max(7, Math.min(365, Number.parseInt(req.query.days || "90", 10) || 90));
   const cacheKey = `candles:${symbol}:${days}`;
   const saved = cached(cacheKey);
   if (saved) return res.json(saved);
+  const to = Math.floor(Date.now() / 1000);
+  const from = to - days * 86400;
+
+  if (key) {
+    try {
+      const candles = await fetchFinnhubCandles(symbol, from, to, key);
+      const result = { symbol, candles, source: "Finnhub", days };
+      setCache(cacheKey, result);
+      return res.json(result);
+    } catch (error) {
+      // Daily candles may be unavailable on the configured Finnhub plan. Keep
+      // the chart controls usable by trying the no-key historical-data fallback.
+      console.warn("Finnhub candles unavailable; trying Yahoo Finance fallback:", error.message);
+    }
+  }
+
   try {
-    const to = Math.floor(Date.now() / 1000);
-    const from = to - days * 86400;
-    const url = new URL("https://finnhub.io/api/v1/stock/candle");
-    url.searchParams.set("symbol", symbol);
-    url.searchParams.set("resolution", "D");
-    url.searchParams.set("from", String(from));
-    url.searchParams.set("to", String(to));
-    url.searchParams.set("token", key);
-    const response = await fetch(url, { signal: AbortSignal.timeout(12000) });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      if (response.status === 429) return res.status(429).json({ error: "Finnhub จำกัดจำนวนคำขอกราฟ ลองใหม่อีกสักครู่" });
-      if (response.status === 401 || response.status === 403) return res.status(502).json({ error: "Finnhub ไม่อนุญาตข้อมูลย้อนหลัง ตรวจ API Key และสิทธิ์แพ็กเกจ" });
-      return res.status(502).json({ error: "Finnhub ตอบกลับข้อมูลกราฟไม่สำเร็จ" });
-    }
-    if (payload.s !== "ok" || !Array.isArray(payload.t) || !Array.isArray(payload.c)) {
-      return res.status(404).json({ error: payload.s === "no_data" ? "ไม่มีข้อมูลย้อนหลังสำหรับหุ้นนี้ในช่วงที่เลือก" : "Finnhub ยังไม่มีข้อมูลกราฟสำหรับหุ้นนี้" });
-    }
-    const candles = payload.t.map((time, index) => ({
-      time: Number(time) * 1000,
-      close: Number(payload.c[index]),
-      high: Number(payload.h?.[index]),
-      low: Number(payload.l?.[index]),
-      open: Number(payload.o?.[index]),
-      volume: Number(payload.v?.[index])
-    })).filter(item => Number.isFinite(item.time) && Number.isFinite(item.close));
-    if (!candles.length) return res.status(404).json({ error: "ข้อมูลย้อนหลังที่ได้รับไม่สมบูรณ์" });
-    const result = { symbol, candles, source: "Finnhub", days };
+    const candles = await fetchYahooCandles(symbol, from, to);
+    const result = { symbol, candles, source: "Yahoo Finance (สำรอง)", days };
     setCache(cacheKey, result);
-    res.json(result);
+    return res.json(result);
   } catch (error) {
-    console.error("Candles error:", error.message);
-    res.status(502).json({ error: "เชื่อมต่อข้อมูลกราฟไม่สำเร็จ" });
+    console.error("Historical chart providers failed:", error.message);
+    return res.status(502).json({
+      error: key
+        ? "ดึงกราฟไม่สำเร็จทั้งจาก Finnhub และแหล่งข้อมูลสำรอง ตรวจ Ticker แล้วลองใหม่"
+        : "ดึงกราฟจากแหล่งข้อมูลสำรองไม่สำเร็จ ตรวจ Ticker แล้วลองใหม่"
+    });
   }
 });
 

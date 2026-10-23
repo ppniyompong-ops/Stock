@@ -90,7 +90,7 @@ async function loadStock(rawSymbol) {
   $("company-name").textContent = "กำลังโหลดข้อมูล...";
   $("company-meta").textContent = "กำลังเชื่อมต่อ Finnhub";
   $("analysis").innerHTML = '<p class="muted">กำลังวิเคราะห์ตัวชี้วัด...</p>';
-  $("chart-caption").textContent = `${symbol} · ราคาปิดรายวันจาก Finnhub`;
+  $("chart-caption").textContent = `${symbol} · ราคาปิดรายวัน (Finnhub และแหล่งข้อมูลสำรอง)`;
   $("price-chart").innerHTML = '<div class="chart-placeholder">กำลังโหลดกราฟราคา…</div>';
   $("export-csv").disabled = true;
   latestCandles = [];
@@ -438,6 +438,7 @@ async function loadChart() {
   try {
     const data = await api(`/api/candles/${encodeURIComponent(symbol)}?days=${encodeURIComponent($("chart-range").value)}`);
     if (requestId !== chartRequestId || symbol !== activeSymbol) return;
+    $("chart-caption").textContent = `${symbol} · ราคาปิดรายวันจาก ${data.source || "แหล่งข้อมูลตลาด"}`;
     renderChart(data.candles || []);
   } catch (error) {
     if (requestId !== chartRequestId || symbol !== activeSymbol) return;
