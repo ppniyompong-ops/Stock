@@ -46,3 +46,104 @@ html{scroll-behavior:smooth;scroll-padding-top:20px}body{line-height:1.55;letter
 @media(prefers-reduced-motion:reduce){.pulse-ticker,.pulse-refresh{transition:none}}
 .status-dot.offline{background:var(--red);box-shadow:none}
 .source-status small{line-height:1.55;overflow-wrap:anywhere}
+
+/* Workspace navigation, theme contrast, and responsive polish. */
+:root{--focus:#8cf0bf;--shadow-soft:0 10px 30px #06101814}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.sidebar{z-index:5;background:var(--bg);overflow:visible;box-shadow:var(--shadow-soft)}
+.brand{margin-bottom:24px}
+.workspace-controls{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px;gap:7px;align-items:center;margin:0 0 18px}
+.workspace-controls select{min-width:0;width:100%;height:38px;padding:0 10px;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);font:600 12px "IBM Plex Sans Thai",sans-serif}
+.workspace-action,.workspace-more>summary{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);font-size:18px;line-height:1}
+.workspace-action:hover,.workspace-more>summary:hover{border-color:var(--green);color:var(--green)}
+.workspace-more{position:relative}
+.workspace-more>summary{cursor:pointer;list-style:none;font-size:15px;letter-spacing:1px}
+.workspace-more>summary::-webkit-details-marker{display:none}
+.workspace-menu{position:absolute;right:0;top:calc(100% + 7px);z-index:20;display:grid;gap:3px;min-width:170px;padding:6px;border:1px solid var(--border);border-radius:11px;background:var(--panel);box-shadow:0 14px 32px #06101830}
+.workspace-menu button{border:0;border-radius:7px;background:transparent;color:var(--text);padding:9px 10px;text-align:left;font-size:12px}
+.workspace-menu button:hover{background:var(--panel2)}
+.workspace-menu .danger-action{color:var(--red)}
+.workspace-menu button:disabled{opacity:.45;cursor:not-allowed}
+.nav-section-label{margin:0 0 7px 10px;color:var(--muted);font:700 10px Manrope,sans-serif;letter-spacing:1.4px;text-transform:uppercase}
+.sidebar-nav{display:grid;gap:3px;min-width:0}
+.sidebar-nav .nav{min-height:42px;margin:0;padding:10px 11px;border:1px solid transparent;color:var(--muted);font-size:13px;transition:background .16s ease,border-color .16s ease,color .16s ease}
+.sidebar-nav .nav svg{flex:0 0 17px;width:17px;height:17px}
+.sidebar-nav .nav:hover{background:var(--panel2);color:var(--text)}
+.sidebar-nav .nav.active{background:var(--green-dark);border-color:color-mix(in srgb,var(--green) 22%,transparent);color:var(--green);font-weight:700}
+.sidebar-nav .nav[aria-current="page"]{box-shadow:inset 3px 0 0 var(--green)}
+.sidebar-bottom{padding-top:16px}
+.source-status{background:var(--panel)}
+.workspace-dialog{width:min(420px,calc(100vw - 32px));border:1px solid var(--border);border-radius:18px;padding:0;background:var(--panel);color:var(--text);box-shadow:0 24px 80px #06101855}
+.workspace-dialog::backdrop{background:#08111888;backdrop-filter:blur(3px)}
+.workspace-dialog form{display:grid;gap:12px;padding:24px}
+.workspace-dialog h2{margin:0 0 4px;font-size:20px}
+.workspace-dialog label{font-size:12px;color:var(--muted)}
+.workspace-dialog input{height:44px;padding:0 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);outline:none}
+.workspace-dialog input:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 16%,transparent)}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.dialog-actions button{min-height:40px;padding:0 14px;border-radius:9px;font-weight:700}
+.secondary-button{border:1px solid var(--border);background:var(--panel);color:var(--text)}
+.primary-button{border:1px solid var(--green);background:var(--green);color:#082018}
+.chart-point{fill:var(--green);stroke:var(--panel);stroke-width:2;vector-effect:non-scaling-stroke}
+.chart-line{stroke:var(--green);stroke-width:3.25}
+.chart-controls button:disabled{opacity:.55;cursor:wait;transform:none}
+.chart-panel,.copilot-panel,.market-pulse{scroll-margin-top:18px}
+.tool-card,.chart-panel,.copilot-panel,.market-pulse{scroll-margin-top:18px}
+.light-theme{--bg:#f1f6f5;--panel:#fff;--panel2:#f5f9f7;--border:#d6e2df;--text:#183036;--muted:#536970;--green:#087f5b;--green-dark:#e2f4ec;--red:#b52c45;--focus:#087f5b;--shadow:0 14px 38px #16372e12;--shadow-soft:0 10px 30px #16372e0c}
+.light-theme body{background:radial-gradient(ellipse at 85% 0%,#dff3e9,transparent 36%),var(--bg);color:var(--text)}
+.light-theme .sidebar{background:#f7fbfa}
+.light-theme .brand,.light-theme .sidebar-nav .nav{color:#465b61}
+.light-theme .brand-ai{color:#087f5b}
+.light-theme .side-label,.light-theme .nav-section-label,.light-theme .eyebrow{color:#5b7178}
+.light-theme .sidebar-nav .nav:hover{background:#eaf3ef;color:#193b35}
+.light-theme .sidebar-nav .nav.active{background:#dff2e8;border-color:#c7e6d8;color:#075c43}
+.light-theme .sidebar-nav .nav[aria-current="page"]{box-shadow:inset 3px 0 0 #087f5b}
+.light-theme .workspace-controls select,.light-theme .workspace-action,.light-theme .workspace-more>summary{background:#fff;color:#263d43;border-color:#d1dfdb}
+.light-theme .workspace-menu{background:#fff;border-color:#d3dfdc;box-shadow:0 14px 32px #18382f20}
+.light-theme .workspace-menu button{color:#243a40}
+.light-theme .workspace-menu button:hover{background:#eff6f3}
+.light-theme .source-status{background:#fff;border-color:#d6e2df}
+.light-theme .source-status strong{color:#263e43}
+.light-theme .live-pill{color:#385057;background:#ffffffaa}
+.light-theme .search-row{background:#fff;border-color:#d1dfdb}
+.light-theme .search-row input{color:#183036}
+.light-theme .quick-picks button,.light-theme .ticker-badge{background:#fff;color:#234139}
+.light-theme .result-item{color:#183036}
+.light-theme .result-item:hover{background:#eef6f2}
+.light-theme .metric-list>div{border-color:#e1eae7}
+.light-theme .analysis-content{color:#344d53}
+.light-theme .analysis-content .observation{background:#eef7f2;border-left-color:#087f5b;color:#29473e}
+.light-theme .tool-card{background:linear-gradient(150deg,#fff,#f8fbfa);box-shadow:0 8px 24px #173b310b}
+.light-theme .watch-row,.light-theme .alert-row{background:#f9fcfb;border-color:#e0e9e6}
+.light-theme .watch-open{color:#183036}
+.light-theme .empty-state{color:#586f75;border-color:#d2dfdb}
+.light-theme .copilot-message.assistant{background:#f5f9f7}
+.light-theme .copilot-message.user{background:#e2f4ec;border-color:#cbe8d9;color:#173b31}
+.light-theme .copilot-form textarea{background:#fff;color:#183036}
+.light-theme .chart-legend button{background:#fff;border-color:#d1dfdb;color:#263d43}
+.light-theme .toast{background:#173b31;border-color:#2a604f;color:#f2fff8}
+.light-theme .workspace-dialog{background:#fff;color:#183036;border-color:#d2dfdb}
+.light-theme .workspace-dialog input{background:#fff;color:#183036}
+.light-theme .secondary-button{background:#fff;color:#263d43}
+.light-theme .market-pulse{background:radial-gradient(ellipse at 100% 0%,#e0f4e9,transparent 38%),var(--panel)}
+.light-theme .pulse-ticker{background:#f8fbfa}
+@media(max-width:720px){
+  .app-shell{display:block}
+  .sidebar{position:sticky;top:0;height:auto;min-height:0;padding:11px 14px 9px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;border-right:0;border-bottom:1px solid var(--border);box-shadow:0 8px 24px #06101818}
+  .brand{margin:0;font-size:17px;min-height:36px}
+  .brand-mark{width:31px;height:31px}
+  .side-label{display:none}
+  .workspace-controls{grid-template-columns:minmax(0,1fr) 38px 38px;margin:0}
+  .sidebar-nav{display:flex;gap:5px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:2px 0 4px}
+  .sidebar-nav .nav{display:flex;flex:0 0 auto;min-height:38px;gap:7px;padding:8px 10px;white-space:nowrap;font-size:12px}
+  .sidebar-nav .nav[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--green)}
+  .nav-section-label,.sidebar-bottom{display:none}
+  .main{padding:18px 14px 20px}
+}
+@media(max-width:400px){
+  .sidebar{padding-inline:10px}
+  .sidebar-nav .nav{padding-inline:8px;font-size:11px}
+  .topbar h1{font-size:18px}
+  .live-pill{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){.sidebar-nav .nav,.sidebar,.workspace-menu{transition:none}}

@@ -4,6 +4,11 @@ const input = $("symbol-input");
 const resultsBox = $("search-results");
 const stockSection = $("stock-section");
 let toastTimer;
+let activeSymbol = "";
+let latestCandles = [];
+let stockRequestId = 0;
+let chartRequestId = 0;
+let lastChartWidth = 0;
 
 function toast(message) {
   const el = $("toast");
@@ -76,6 +81,8 @@ document.querySelectorAll("[data-symbol]").forEach(button => {
 async function loadStock(rawSymbol) {
   const symbol = String(rawSymbol || "").trim().toUpperCase();
   if (!symbol) return;
+  activeSymbol = symbol;
+  const requestId = ++stockRequestId;
   input.value = symbol;
   stockSection.classList.remove("hidden");
   resultsBox.classList.add("hidden");
@@ -83,6 +90,11 @@ async function loadStock(rawSymbol) {
   $("company-name").textContent = "กำลังโหลดข้อมูล...";
   $("company-meta").textContent = "กำลังเชื่อมต่อ Finnhub";
   $("analysis").innerHTML = '<p class="muted">กำลังวิเคราะห์ตัวชี้วัด...</p>';
+  $("chart-caption").textContent = `${symbol} · ราคาปิดรายวันจาก Finnhub`;
+  $("price-chart").innerHTML = '<div class="chart-placeholder">กำลังโหลดกราฟราคา…</div>';
+  $("export-csv").disabled = true;
+  latestCandles = [];
+  void loadChart();
   stockSection.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const [quoteR, profileR, metricsR, analysisR] = await Promise.allSettled([
@@ -91,6 +103,7 @@ async function loadStock(rawSymbol) {
     api(`/api/metrics/${encodeURIComponent(symbol)}`),
     api(`/api/analysis/${encodeURIComponent(symbol)}`)
   ]);
+  if (requestId !== stockRequestId) return;
   const quote = quoteR.status === "fulfilled" ? quoteR.value : null;
   const profile = profileR.status === "fulfilled" ? profileR.value : null;
   const metrics = metricsR.status === "fulfilled" ? metricsR.value : null;
@@ -131,16 +144,172 @@ async function loadStock(rawSymbol) {
 }
 if (window.lucide) window.lucide.createIcons();
 
-// Extra workspace tools: watchlist, comparisons, local price alerts, return calculator,
-// historical chart + CSV export, and a persisted light/dark preference.
-let activeSymbol = "";
-let latestCandles = [];
+// Workspace data is kept locally and separated by the selected workspace.
+const workspaceStorageKey = "stocklens-workspaces";
+const workspaceActiveKey = "stocklens-active-workspace";
+const defaultWorkspace = { id: "default", name: "ส่วนตัว" };
+function loadWorkspaces() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(workspaceStorageKey) || "null");
+    const valid = Array.isArray(parsed) ? parsed.filter(item => item && typeof item.id === "string" && typeof item.name === "string" && item.name.trim()).slice(0, 8) : [];
+    return valid.length ? valid : [{ ...defaultWorkspace }];
+  } catch { return [{ ...defaultWorkspace }]; }
+}
+let workspaces = loadWorkspaces();
+let activeWorkspaceId = (() => {
+  try { const saved = localStorage.getItem(workspaceActiveKey); return workspaces.some(item => item.id === saved) ? saved : workspaces[0].id; }
+  catch { return workspaces[0].id; }
+})();
+function saveWorkspaces() {
+  try {
+    localStorage.setItem(workspaceStorageKey, JSON.stringify(workspaces));
+    localStorage.setItem(workspaceActiveKey, activeWorkspaceId);
+  } catch { toast("เบราว์เซอร์ไม่อนุญาตให้บันทึก Workspace"); }
+}
+function scopedStorageKey(key, workspaceId = activeWorkspaceId) { return `${key}:${workspaceId}`; }
 const readStore = (key, fallback = []) => {
-  try { const value = JSON.parse(localStorage.getItem(key) || "null"); return Array.isArray(fallback) ? (Array.isArray(value) ? value : fallback) : (value ?? fallback); }
+  try {
+    let raw = localStorage.getItem(scopedStorageKey(key));
+    if (raw === null && activeWorkspaceId === "default") {
+      raw = localStorage.getItem(key);
+      if (raw !== null) localStorage.setItem(scopedStorageKey(key), raw);
+    }
+    const value = JSON.parse(raw || "null");
+    return Array.isArray(fallback) ? (Array.isArray(value) ? value : fallback) : (value ?? fallback);
+  }
   catch { return fallback; }
 };
-const writeStore = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { toast("อุปกรณ์ไม่อนุญาตให้บันทึกข้อมูลในเบราว์เซอร์"); } };
+const writeStore = (key, value) => { try { localStorage.setItem(scopedStorageKey(key), JSON.stringify(value)); } catch { toast("อุปกรณ์ไม่อนุญาตให้บันทึกข้อมูลในเบราว์เซอร์"); } };
 const safeSymbol = (value) => String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+
+function renderWorkspaceControls() {
+  const select = $("workspace-select");
+  select.replaceChildren();
+  for (const workspace of workspaces) {
+    const option = document.createElement("option");
+    option.value = workspace.id;
+    option.textContent = workspace.name;
+    select.append(option);
+  }
+  select.value = activeWorkspaceId;
+  $("workspace-delete").disabled = workspaces.length <= 1;
+}
+
+let workspaceDialogMode = "create";
+function openWorkspaceDialog(mode) {
+  workspaceDialogMode = mode;
+  const dialog = $("workspace-dialog");
+  const nameInput = $("workspace-name");
+  const current = workspaces.find(item => item.id === activeWorkspaceId);
+  $("workspace-dialog-title").textContent = mode === "create" ? "เพิ่ม Workspace" : "เปลี่ยนชื่อ Workspace";
+  nameInput.value = mode === "rename" ? (current?.name || "") : "";
+  dialog.showModal();
+  nameInput.focus();
+}
+
+$("workspace-select").addEventListener("change", () => {
+  activeWorkspaceId = $("workspace-select").value;
+  saveWorkspaces();
+  renderWatchlist();
+  renderAlerts();
+  checkPriceAlerts();
+  document.querySelector(".workspace-more").open = false;
+  toast(`เปลี่ยนเป็น Workspace: ${workspaces.find(item => item.id === activeWorkspaceId)?.name || ""}`);
+});
+$("workspace-add").addEventListener("click", () => {
+  if (workspaces.length >= 8) return toast("สร้าง Workspace ได้สูงสุด 8 รายการ");
+  openWorkspaceDialog("create");
+});
+$("workspace-rename").addEventListener("click", () => {
+  document.querySelector(".workspace-more").open = false;
+  openWorkspaceDialog("rename");
+});
+$("workspace-delete").addEventListener("click", () => {
+  document.querySelector(".workspace-more").open = false;
+  if (workspaces.length <= 1) return toast("ต้องเหลือ Workspace อย่างน้อย 1 รายการ");
+  const current = workspaces.find(item => item.id === activeWorkspaceId);
+  if (!current || !window.confirm(`ลบ Workspace “${current.name}” และรายการติดตาม/แจ้งเตือนของ Workspace นี้หรือไม่?`)) return;
+  try {
+    localStorage.removeItem(scopedStorageKey("stocklens-watchlist", current.id));
+    localStorage.removeItem(scopedStorageKey("stocklens-alerts", current.id));
+  } catch {}
+  workspaces = workspaces.filter(item => item.id !== current.id);
+  activeWorkspaceId = workspaces[0].id;
+  saveWorkspaces();
+  renderWorkspaceControls();
+  renderWatchlist();
+  renderAlerts();
+  toast("ลบ Workspace แล้ว");
+});
+$("workspace-form").addEventListener("submit", event => {
+  event.preventDefault();
+  const name = $("workspace-name").value.trim();
+  if (!name) return toast("กรุณาตั้งชื่อ Workspace");
+  if (workspaces.some(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase() && (workspaceDialogMode === "create" || item.id !== activeWorkspaceId))) {
+    return toast("มี Workspace ชื่อนี้แล้ว");
+  }
+  if (workspaceDialogMode === "create") {
+    const id = globalThis.crypto?.randomUUID?.() || `workspace-${Date.now().toString(36)}`;
+    workspaces.push({ id, name });
+    activeWorkspaceId = id;
+  } else {
+    const current = workspaces.find(item => item.id === activeWorkspaceId);
+    if (current) current.name = name;
+  }
+  saveWorkspaces();
+  renderWorkspaceControls();
+  renderWatchlist();
+  renderAlerts();
+  $("workspace-dialog").close();
+  toast(workspaceDialogMode === "create" ? `สร้าง Workspace “${name}” แล้ว` : "เปลี่ยนชื่อ Workspace แล้ว");
+});
+$("workspace-cancel").addEventListener("click", () => $("workspace-dialog").close());
+document.addEventListener("click", event => {
+  if (!event.target.closest(".workspace-more")) document.querySelector(".workspace-more").open = false;
+});
+
+function setActiveNavigation(targetId) {
+  const links = [...document.querySelectorAll(".sidebar-nav .nav")];
+  const chosen = links.find(link => link.dataset.navTarget === targetId) || links[0];
+  for (const link of links) {
+    const active = link === chosen;
+    link.classList.toggle("active", active);
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  }
+}
+document.querySelector(".sidebar-nav").addEventListener("click", event => {
+  const link = event.target.closest("a[data-nav-target]");
+  if (!link) return;
+  let targetId = link.dataset.navTarget;
+  let target = $(targetId);
+  if (link.dataset.requiresStock && stockSection.classList.contains("hidden")) {
+    event.preventDefault();
+    targetId = "research";
+    target = $(targetId);
+    toast("ค้นหาหุ้นก่อน เพื่อเปิดตัวชี้วัดของบริษัท");
+  } else {
+    event.preventDefault();
+  }
+  if (!target) return;
+  if (location.hash !== `#${targetId}`) history.pushState({}, "", `#${targetId}`);
+  setActiveNavigation(targetId);
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (targetId === "research") setTimeout(() => input.focus({ preventScroll: true }), 350);
+});
+window.addEventListener("hashchange", () => setActiveNavigation(location.hash.slice(1)));
+window.addEventListener("popstate", () => setActiveNavigation(location.hash.slice(1)));
+if ("IntersectionObserver" in window) {
+  const navObserver = new IntersectionObserver(entries => {
+    const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (visible) setActiveNavigation(visible.target.id);
+  }, { rootMargin: "-15% 0px -70% 0px", threshold: [0, .15, .35, .6] });
+  for (const link of document.querySelectorAll(".sidebar-nav .nav")) {
+    const target = $(link.dataset.navTarget);
+    if (target) navObserver.observe(target);
+  }
+}
+setActiveNavigation(location.hash.slice(1) || "market-pulse");
 
 function renderWatchlist() {
   const host = $("watchlist"); const items = readStore("stocklens-watchlist"); host.replaceChildren();
@@ -161,34 +330,6 @@ $("watch-add")?.addEventListener("click", () => {
   writeStore("stocklens-watchlist", [...items, symbol]); $("watch-input").value = ""; renderWatchlist(); toast(`เพิ่ม ${symbol} แล้ว`);
 });
 
-function renderCompare() {
-  const host = $("compare-list"); const items = readStore("stocklens-compare"); host.replaceChildren();
-  if (!items.length) { host.innerHTML = '<p class="empty-state">เพิ่มหุ้นได้สูงสุด 3 ตัว</p>'; return; }
-  const table = document.createElement("div"); table.className = "compare-table";
-  const header = document.createElement("div"); header.className = "compare-row compare-head"; header.innerHTML = '<span>Ticker</span><span>ราคา</span><span>P/E</span><span></span>'; table.append(header);
-  items.forEach(symbol => {
-    const row = document.createElement("div"); row.className = "compare-row";
-    const name = document.createElement("button"); name.className = "watch-open"; name.textContent = symbol; name.addEventListener("click", () => loadStock(symbol));
-    const price = document.createElement("span"); price.textContent = "…";
-    const pe = document.createElement("span"); pe.textContent = "…";
-    const remove = document.createElement("button"); remove.className = "remove-button"; remove.textContent = "×"; remove.setAttribute("aria-label", `ลบ ${symbol} จากเปรียบเทียบ`); remove.addEventListener("click", () => { writeStore("stocklens-compare", items.filter(x => x !== symbol)); renderCompare(); });
-    row.append(name, price, pe, remove); table.append(row);
-    Promise.allSettled([api(`/api/quote/${encodeURIComponent(symbol)}`), api(`/api/metrics/${encodeURIComponent(symbol)}`)]).then(([q,m]) => {
-      price.textContent = q.status === "fulfilled" ? fmt(q.value.price, "", 2) : "N/A";
-      pe.textContent = m.status === "fulfilled" ? fmt(m.value?.metrics?.peTTM ?? m.value?.peTTM, "x") : "N/A";
-    });
-  });
-  host.append(table);
-}
-$("compare-add")?.addEventListener("click", () => {
-  const symbol = safeSymbol($("compare-input").value);
-  if (!/^[A-Z0-9.^-]{1,20}$/.test(symbol)) return toast("กรุณากรอก Ticker ให้ถูกต้อง");
-  const items = readStore("stocklens-compare");
-  if (items.includes(symbol)) return toast("มีหุ้นนี้ในการเปรียบเทียบแล้ว");
-  if (items.length >= 3) return toast("เปรียบเทียบได้สูงสุด 3 หุ้น");
-  writeStore("stocklens-compare", [...items, symbol]); $("compare-input").value = ""; renderCompare();
-});
-
 function renderAlerts() {
   const host = $("alerts-list"); const items = readStore("stocklens-alerts"); host.replaceChildren();
   if (!items.length) { host.innerHTML = '<p class="empty-state">ยังไม่มีการแจ้งเตือน</p>'; return; }
@@ -207,53 +348,117 @@ $("alert-add")?.addEventListener("click", () => {
   items.push({ symbol, target, direction, triggered: false }); writeStore("stocklens-alerts", items); renderAlerts(); toast("บันทึกแจ้งเตือนแล้ว");
 });
 async function checkPriceAlerts() {
+  const workspaceId = activeWorkspaceId;
   const items = readStore("stocklens-alerts"); let changed = false;
   for (const item of items) {
     if (item.triggered) continue;
     try {
       const q = await api(`/api/quote/${encodeURIComponent(item.symbol)}`);
+      if (workspaceId !== activeWorkspaceId) return;
       const hit = item.direction === "above" ? Number(q.price) >= item.target : Number(q.price) <= item.target;
       if (hit) { item.triggered = true; changed = true; toast(`แจ้งเตือน ${item.symbol}: ราคาถึง ${fmt(q.price)} แล้ว`); }
     } catch { /* API may be unavailable or rate-limited; retry on next page visit. */ }
   }
-  if (changed) { writeStore("stocklens-alerts", items); renderAlerts(); }
+  if (changed && workspaceId === activeWorkspaceId) { writeStore("stocklens-alerts", items); renderAlerts(); }
 }
-
-function calculateReturn() {
-  const investment = Number($("calc-investment").value); const entry = Number($("calc-entry").value); const target = Number($("calc-target").value);
-  const profitEl = $("calc-profit"); const returnEl = $("calc-return");
-  if (![investment, entry, target].every(Number.isFinite) || investment < 0 || entry <= 0 || target < 0) { profitEl.textContent = "ตรวจสอบข้อมูล"; returnEl.textContent = "กรอกตัวเลขที่ถูกต้อง"; return; }
-  const profit = investment / entry * (target - entry); const pct = (target / entry - 1) * 100;
-  profitEl.textContent = `${profit >= 0 ? "+" : "−"}${Math.abs(profit).toLocaleString("en-US", {maximumFractionDigits:2, minimumFractionDigits:2})}`;
-  profitEl.classList.toggle("negative", profit < 0); returnEl.textContent = `ผลตอบแทน ${pct >= 0 ? "+" : ""}${pct.toFixed(2)}% · ยังไม่หักค่าธรรมเนียม/ภาษี`;
-}
-["calc-investment", "calc-entry", "calc-target"].forEach(id => $(id)?.addEventListener("input", calculateReturn));
 
 function renderChart(candles) {
-  const host = $("price-chart"); host.replaceChildren(); latestCandles = candles;
-  if (!candles.length) { host.innerHTML = '<div class="chart-placeholder">ไม่มีข้อมูลกราฟในช่วงเวลานี้</div>'; $("export-csv").disabled = true; return; }
-  const width = 900, height = 260, pad = { top: 18, right: 16, bottom: 28, left: 54 };
-  const values = candles.map(c => Number(c.close)).filter(Number.isFinite); const min = Math.min(...values), max = Math.max(...values); const range = max - min || Math.max(1, Math.abs(max) * .02);
-  const x = i => pad.left + i * (width - pad.left - pad.right) / Math.max(1, candles.length - 1);
-  const y = v => pad.top + (max - v) * (height - pad.top - pad.bottom) / range;
-  const ns = "http://www.w3.org/2000/svg"; const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${width} ${height}`); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", `กราฟราคาปิด ${activeSymbol}`);
-  for (let i=0;i<4;i++) { const yy=pad.top+i*(height-pad.top-pad.bottom)/3; const line=document.createElementNS(ns,"line"); line.setAttribute("x1",pad.left);line.setAttribute("x2",width-pad.right);line.setAttribute("y1",yy);line.setAttribute("y2",yy);line.setAttribute("class","chart-gridline");svg.append(line); const label=document.createElementNS(ns,"text");label.setAttribute("x",pad.left-8);label.setAttribute("y",yy+4);label.setAttribute("text-anchor","end");label.setAttribute("class","chart-label");label.textContent=fmt(max-i*range/3,"",2);svg.append(label); }
-  const path=document.createElementNS(ns,"path"); path.setAttribute("d",values.map((v,i)=>`${i?"L":"M"}${x(i)},${y(v)}`).join(" "));path.setAttribute("class","chart-line");svg.append(path);
-  const area=document.createElementNS(ns,"path"); area.setAttribute("d",`${path.getAttribute("d")} L${x(values.length-1)},${height-pad.bottom} L${x(0)},${height-pad.bottom} Z`);area.setAttribute("class","chart-area");svg.insertBefore(area,path);
-  const start=document.createElementNS(ns,"text");start.setAttribute("x",pad.left);start.setAttribute("y",height-6);start.setAttribute("class","chart-label");start.textContent=new Date(candles[0].time).toLocaleDateString();svg.append(start);
-  const end=document.createElementNS(ns,"text");end.setAttribute("x",width-pad.right);end.setAttribute("y",height-6);end.setAttribute("text-anchor","end");end.setAttribute("class","chart-label");end.textContent=new Date(candles[candles.length-1].time).toLocaleDateString();svg.append(end);
+  const host = $("price-chart");
+  const rows = candles.filter(item => Number.isFinite(Number(item?.time)) && Number.isFinite(Number(item?.close)));
+  host.replaceChildren();
+  latestCandles = rows;
+  if (!rows.length) {
+    host.innerHTML = '<div class="chart-placeholder">ไม่มีข้อมูลราคาย้อนหลังสำหรับ Ticker หรือช่วงเวลานี้</div>';
+    $("export-csv").disabled = true;
+    return;
+  }
+
+  const width = Math.max(host.clientWidth || 920, 340), height = 300, pad = { top: 20, right: 20, bottom: 34, left: 70 };
+  lastChartWidth = width;
+  const values = rows.map(item => Number(item.close));
+  const rawMin = Math.min(...values), rawMax = Math.max(...values);
+  const spread = rawMax - rawMin || Math.max(Math.abs(rawMax) * 0.02, 1);
+  const min = rawMin - spread * 0.08, max = rawMax + spread * 0.08, range = max - min;
+  const plotWidth = width - pad.left - pad.right, plotHeight = height - pad.top - pad.bottom;
+  const x = index => pad.left + index * plotWidth / Math.max(1, rows.length - 1);
+  const y = value => pad.top + (max - value) * plotHeight / range;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `กราฟเส้นราคาปิด ${activeSymbol}`);
+
+  for (let index = 0; index < 4; index++) {
+    const value = max - index * range / 3;
+    const yy = y(value);
+    const grid = document.createElementNS(ns, "line");
+    grid.setAttribute("x1", pad.left); grid.setAttribute("x2", width - pad.right);
+    grid.setAttribute("y1", yy); grid.setAttribute("y2", yy);
+    grid.setAttribute("class", "chart-gridline"); svg.append(grid);
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", pad.left - 10); label.setAttribute("y", yy + 4);
+    label.setAttribute("text-anchor", "end"); label.setAttribute("class", "chart-label");
+    label.textContent = fmt(value, "", 2); svg.append(label);
+  }
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", values.map((value, index) => `${index ? "L" : "M"}${x(index)},${y(value)}`).join(" "));
+  path.setAttribute("class", "chart-line"); svg.append(path);
+  for (const index of [...new Set([0, rows.length - 1])]) {
+    const point = document.createElementNS(ns, "circle");
+    point.setAttribute("cx", x(index)); point.setAttribute("cy", y(values[index])); point.setAttribute("r", "4");
+    point.setAttribute("class", "chart-point"); svg.append(point);
+  }
+
+  const dateLabel = timestamp => new Date(Number(timestamp)).toLocaleDateString("th-TH", { day: "numeric", month: "short", timeZone: "Asia/Bangkok" });
+  const start = document.createElementNS(ns, "text");
+  start.setAttribute("x", pad.left); start.setAttribute("y", height - 8); start.setAttribute("class", "chart-label");
+  start.textContent = dateLabel(rows[0].time); svg.append(start);
+  const end = document.createElementNS(ns, "text");
+  end.setAttribute("x", width - pad.right); end.setAttribute("y", height - 8); end.setAttribute("text-anchor", "end");
+  end.setAttribute("class", "chart-label"); end.textContent = dateLabel(rows[rows.length - 1].time); svg.append(end);
   host.append(svg);
-  const stats=document.createElement("div");stats.className="chart-stats";const first=values[0],last=values[values.length-1],change=(last/first-1)*100;
-  stats.textContent=`${activeSymbol} · ${candles.length} วันซื้อขาย · ล่าสุด ${fmt(last)} · เปลี่ยนแปลงในช่วง ${change>=0?"+":""}${change.toFixed(2)}%`;host.append(stats);$("export-csv").disabled=false;
+
+  const first = values[0], last = values[values.length - 1], change = first ? (last / first - 1) * 100 : 0;
+  const stats = document.createElement("div");
+  stats.className = "chart-stats";
+  stats.textContent = `${activeSymbol} · ${rows.length} วันซื้อขาย · ล่าสุด ${fmt(last)} · เปลี่ยนแปลง ${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+  host.append(stats);
+  $("export-csv").disabled = false;
 }
 async function loadChart() {
   if (!activeSymbol) return toast("ค้นหาหุ้นก่อน แล้วจึงโหลดกราฟ");
-  const host = $("price-chart"); host.innerHTML='<div class="chart-placeholder">กำลังโหลดข้อมูลกราฟ…</div>'; $("export-csv").disabled=true;
-  try { const data=await api(`/api/candles/${encodeURIComponent(activeSymbol)}?days=${encodeURIComponent($("chart-range").value)}`);renderChart(data.candles||[]); }
-  catch(error) { host.innerHTML=''; const message=document.createElement("div");message.className="chart-placeholder";message.textContent=error.message||"โหลดกราฟไม่สำเร็จ";host.append(message); }
+  const requestId = ++chartRequestId;
+  const symbol = activeSymbol;
+  const host = $("price-chart");
+  const loadButton = $("chart-load");
+  host.innerHTML = '<div class="chart-placeholder">กำลังโหลดข้อมูลกราฟ…</div>';
+  $("export-csv").disabled = true;
+  loadButton.disabled = true;
+  try {
+    const data = await api(`/api/candles/${encodeURIComponent(symbol)}?days=${encodeURIComponent($("chart-range").value)}`);
+    if (requestId !== chartRequestId || symbol !== activeSymbol) return;
+    renderChart(data.candles || []);
+  } catch (error) {
+    if (requestId !== chartRequestId || symbol !== activeSymbol) return;
+    host.replaceChildren();
+    const message = document.createElement("div");
+    message.className = "chart-placeholder";
+    message.textContent = error.message || "โหลดกราฟไม่สำเร็จ ลองอีกครั้งภายหลัง";
+    host.append(message);
+  } finally {
+    if (requestId === chartRequestId) loadButton.disabled = false;
+  }
 }
 $("chart-load")?.addEventListener("click", loadChart);
 $("chart-range")?.addEventListener("change", loadChart);
+if ("ResizeObserver" in window) {
+  const chartResizeObserver = new ResizeObserver(() => {
+    const width = Math.max($("price-chart").clientWidth || 920, 340);
+    if (latestCandles.length && Math.abs(width - lastChartWidth) > 8) renderChart(latestCandles);
+  });
+  chartResizeObserver.observe($("price-chart"));
+}
 $("export-csv")?.addEventListener("click", () => {
   if (!latestCandles.length) return;
   const rows=[["date","open","high","low","close","volume"],...latestCandles.map(c=>[new Date(c.time).toISOString().slice(0,10),c.open,c.high,c.low,c.close,c.volume])];
@@ -261,11 +466,22 @@ $("export-csv")?.addEventListener("click", () => {
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));const a=document.createElement("a");a.href=url;a.download=`${activeSymbol}-history.csv`;document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);toast("ส่งออก CSV แล้ว");
 });
 
-$("theme-toggle")?.addEventListener("click", () => {
-  const light=document.documentElement.classList.toggle("light-theme");
-  try { localStorage.setItem("stocklens-theme",light?"light":"dark"); } catch {}
-});
-try { if (localStorage.getItem("stocklens-theme")==="light") document.documentElement.classList.add("light-theme"); } catch {}
+function applyTheme(light, persist = false) {
+  document.documentElement.classList.toggle("light-theme", light);
+  const button = $("theme-toggle");
+  if (button) {
+    button.textContent = light ? "☾" : "☀";
+    button.setAttribute("aria-label", light ? "เปลี่ยนเป็นธีมมืด" : "เปลี่ยนเป็นธีมสว่าง");
+    button.title = light ? "เปลี่ยนเป็นธีมมืด" : "เปลี่ยนเป็นธีมสว่าง";
+  }
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+  if (themeColor) themeColor.content = light ? "#f1f6f5" : "#0b1118";
+  if (persist) { try { localStorage.setItem("stocklens-theme", light ? "light" : "dark"); } catch {} }
+}
+let savedLightTheme = false;
+try { savedLightTheme = localStorage.getItem("stocklens-theme") === "light"; } catch {}
+applyTheme(savedLightTheme);
+$("theme-toggle")?.addEventListener("click", () => applyTheme(!document.documentElement.classList.contains("light-theme"), true));
 
 function formatPulseDate(value) {
   if (!value) return "ยังไม่มีข้อมูลตามรอบเวลา";
@@ -355,9 +571,9 @@ async function loadIntegrationStatus() {
 }
 loadIntegrationStatus();
 
-const originalLoadStock = loadStock;
-loadStock = async function(symbol) { activeSymbol=safeSymbol(symbol); await originalLoadStock(symbol); await loadChart(); };
-renderWatchlist(); renderCompare(); renderAlerts(); calculateReturn();
+renderWorkspaceControls();
+renderWatchlist();
+renderAlerts();
 checkPriceAlerts();
 
 // Stock Co-Pilot chat UI; no API key is ever sent to the browser.

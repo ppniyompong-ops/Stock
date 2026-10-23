@@ -164,10 +164,25 @@ app.get("/api/candles/:symbol", async (req, res) => {
     url.searchParams.set("to", String(to));
     url.searchParams.set("token", key);
     const response = await fetch(url, { signal: AbortSignal.timeout(12000) });
-    if (!response.ok) return res.status(response.status === 429 ? 429 : 502).json({ error: "ดึงข้อมูลกราฟไม่สำเร็จ" });
-    const payload = await response.json();
-    if (payload.s !== "ok" || !Array.isArray(payload.c)) return res.status(404).json({ error: "ไม่มีข้อมูลย้อนหลังสำหรับหุ้นนี้" });
-    const result = { symbol, candles: payload.t.map((t, i) => ({ time: t * 1000, close: payload.c[i], high: payload.h[i], low: payload.l[i], open: payload.o[i], volume: payload.v[i] })), source: "Finnhub", days };
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (response.status === 429) return res.status(429).json({ error: "Finnhub จำกัดจำนวนคำขอกราฟ ลองใหม่อีกสักครู่" });
+      if (response.status === 401 || response.status === 403) return res.status(502).json({ error: "Finnhub ไม่อนุญาตข้อมูลย้อนหลัง ตรวจ API Key และสิทธิ์แพ็กเกจ" });
+      return res.status(502).json({ error: "Finnhub ตอบกลับข้อมูลกราฟไม่สำเร็จ" });
+    }
+    if (payload.s !== "ok" || !Array.isArray(payload.t) || !Array.isArray(payload.c)) {
+      return res.status(404).json({ error: payload.s === "no_data" ? "ไม่มีข้อมูลย้อนหลังสำหรับหุ้นนี้ในช่วงที่เลือก" : "Finnhub ยังไม่มีข้อมูลกราฟสำหรับหุ้นนี้" });
+    }
+    const candles = payload.t.map((time, index) => ({
+      time: Number(time) * 1000,
+      close: Number(payload.c[index]),
+      high: Number(payload.h?.[index]),
+      low: Number(payload.l?.[index]),
+      open: Number(payload.o?.[index]),
+      volume: Number(payload.v?.[index])
+    })).filter(item => Number.isFinite(item.time) && Number.isFinite(item.close));
+    if (!candles.length) return res.status(404).json({ error: "ข้อมูลย้อนหลังที่ได้รับไม่สมบูรณ์" });
+    const result = { symbol, candles, source: "Finnhub", days };
     setCache(cacheKey, result);
     res.json(result);
   } catch (error) {
