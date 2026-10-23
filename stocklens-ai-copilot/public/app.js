@@ -7,11 +7,11 @@ const I18N = {
     "pulse.title":"ภาพรวมตลาดประจำวัน","pulse.description":"ราคาและการเปลี่ยนแปลงของหุ้นกับ ETF ที่ติดตาม","pulse.refresh":"อัปเดตตลาด","pulse.loadingDate":"กำลังโหลด…","pulse.connecting":"กำลังโหลดตลาด","pulse.loading":"กำลังโหลดสรุปตลาดล่าสุด","pulse.loadingPrices":"กำลังโหลดข้อมูลราคา…","pulse.refreshing":"กำลังอัปเดตราคาและสรุปตลาด","pulse.manualDone":"อัปเดตแล้ว","pulse.cronDone":"ข้อมูลจากรอบล่าสุด","pulse.runFailed":"อัปเดตไม่สำเร็จ","pulse.noRun":"ยังไม่มีรอบอัปเดต","pulse.pricesFor":"ข้อมูลวันที่","pulse.noBrief":"ยังไม่มีข้อมูลตลาด","pulse.refreshPrompt":"กดอัปเดตตลาดเพื่อดึงราคาและสร้างสรุป","pulse.noPrices":"ยังไม่มีราคาให้แสดง","pulse.errorTitle":"โหลดภาพรวมตลาดไม่ได้","pulse.checkServices":"ตรวจ Finnhub และการเชื่อมต่อ Neon แล้วลองอีกครั้ง",
     "news.title":"ข่าวที่มีผลต่อตลาด","news.refresh":"อัปเดตข่าว","news.loading":"กำลังโหลดข่าวตลาด…","news.empty":"ยังไม่มีข่าวสำคัญในช่วงนี้","news.error":"โหลดข่าวตลาดไม่ได้","news.highImpact":"ประเด็นมหภาค","news.companyImpact":"ข่าวบริษัท","news.marketWatch":"ติดตามตลาด","news.topic.rates":"ดอกเบี้ย","news.topic.inflation":"เงินเฟ้อ","news.topic.economy":"เศรษฐกิจ","news.topic.trade":"การค้า/นโยบาย","news.topic.energy":"พลังงาน/ภูมิรัฐศาสตร์","news.topic.company":"บริษัท",
     "movers.title":"กลุ่มมาแรงวันนี้","movers.description":"จัดอันดับ ETF และดัชนีตามการเปลี่ยนแปลงของวันนี้","movers.refresh":"อัปเดต","movers.gainers":"บวกมากสุด","movers.losers":"ลบมากสุด","movers.loading":"กำลังโหลดกลุ่มตลาด…","movers.error":"โหลดข้อมูลกลุ่มตลาดไม่ได้","movers.emptyGainers":"ยังไม่พบกลุ่มที่ปรับขึ้นในข้อมูลล่าสุด","movers.emptyLosers":"ยังไม่พบกลุ่มที่ปรับลงในข้อมูลล่าสุด","movers.updated":"อัปเดตข้อมูล","movers.up":"ขึ้น","movers.down":"ลง",
-    "stage.eyebrow":"02 · TREND STAGE","stage.title":"วิเคราะห์ Stage ของหุ้น","stage.description":"คำนวณจากราคาปิดรายสัปดาห์และเส้นค่าเฉลี่ย 30 สัปดาห์","stage.loading":"กำลังคำนวณ Stage…","stage.unavailable":"ข้อมูลย้อนหลังยังไม่ถึง 34 สัปดาห์ จึงประเมิน Stage ไม่ได้","stage.figureCaption":"ภาพประกอบแนวคิด ไม่ใช่กราฟราคาจริง","stage.priceLine":"ราคาหุ้น","stage.averageLine":"เส้นเฉลี่ยระยะยาว","stage.name1":"Stage 1 · Basing","stage.desc1":"หลังขาลง ราคาเริ่มสร้างฐานและเส้นเฉลี่ยเริ่มแบน","stage.name2":"Stage 2 · Advancing","stage.desc2":"ราคาอยู่เหนือเส้นเฉลี่ยที่กำลังชี้ขึ้น","stage.name3":"Stage 3 · Topping","stage.desc3":"แรงขึ้นเริ่มชะลอ ราคาแกว่งและเส้นเฉลี่ยเริ่มแบน","stage.name4":"Stage 4 · Declining","stage.desc4":"ราคาอยู่ใต้เส้นเฉลี่ยที่กำลังชี้ลง","stage.priceVsAverage":"ราคาล่าสุดเทียบ SMA 30 สัปดาห์","stage.averageSlope":"ความชัน SMA ใน 4 สัปดาห์","stage.relative":"ผลตอบแทนเทียบ SPY ในราว 30 สัปดาห์","stage.above":"เหนือเส้นเฉลี่ย","stage.below":"ใต้เส้นเฉลี่ย","stage.flat":"เส้นเฉลี่ยค่อนข้างแบน","stage.rising":"เส้นเฉลี่ยกำลังชี้ขึ้น","stage.falling":"เส้นเฉลี่ยกำลังชี้ลง","stage.rsUnavailable":"ไม่มีข้อมูล SPY ที่ตรงกัน",
+
     "pulse.symbolsTitle":"หุ้นที่แสดงในภาพรวม","pulse.symbolsDescription":"รายการนี้บันทึกแยกตาม Workspace บนอุปกรณ์นี้","pulse.symbolsPlaceholder":"Ticker เช่น AAPL","pulse.addSymbol":"เพิ่มหุ้น","pulse.removeSymbol":"เอาออกจากภาพรวม","pulse.invalidSymbol":"กรอก Ticker ให้ถูกต้อง","pulse.existsSymbol":"Ticker นี้อยู่ในรายการแล้ว","pulse.symbolLimit":"เลือกได้สูงสุด 12 Ticker","pulse.noSymbols":"ยังไม่มีหุ้นในรายการ เพิ่ม Ticker เพื่อเริ่มติดตาม","pulse.loadingQuotes":"กำลังโหลดราคาหุ้นที่เลือก…","pulse.quoteUnavailable":"ดึงราคาไม่สำเร็จ",
-    "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"ค้นหาและวิเคราะห์หุ้น","stocks.description":"เลือกราคา ดูผลต่างวันนี้และตั้งแต่ต้นปี พร้อมกราฟย้อนหลังของหุ้นตัวเดียวกัน","stocks.searchPlaceholder":"ค้นหา Ticker เช่น AAPL, MSFT","stocks.search":"ค้นหา","stocks.popular":"หุ้นยอดนิยม","stocks.company":"COMPANY OVERVIEW","stock.performanceHeading":"ราคาและผลตอบแทน","stock.valuationHeading":"ตัวชี้วัดสำคัญ","stock.performanceLabel":"01 · PRICE & PERFORMANCE","stock.valuationLabel":"03 · VALUATION SNAPSHOT","stock.researchLabel":"04 · RESEARCH NOTES","stock.metricsLabel":"05 · FINANCIAL DETAIL",
+    "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"ค้นหาและวิเคราะห์หุ้น","stocks.description":"เลือกราคา ดูผลต่างวันนี้และตั้งแต่ต้นปี พร้อมกราฟย้อนหลังของหุ้นตัวเดียวกัน","stocks.searchPlaceholder":"ค้นหา Ticker เช่น AAPL, MSFT","stocks.search":"ค้นหา","stocks.popular":"หุ้นยอดนิยม","stocks.company":"COMPANY OVERVIEW","stock.valuationHeading":"ตัวชี้วัดพื้นฐาน","stock.priceSummary":"สรุปราคาหุ้น","stock.researchLabel":"RESEARCH NOTES","stock.metricsLabel":"KEY METRICS",
     "stock.lastPrice":"ราคาล่าสุด","stock.today":"เปลี่ยนแปลงวันนี้","stock.ytd":"เปลี่ยนแปลงปีนี้ (YTD)","stock.todayHint":"เทียบราคาปิดวันก่อน","stock.ytdHint":"เทียบราคาปิดสิ้นปีก่อน","stock.marketCap":"มูลค่าตลาด","stock.marketCapHint":"หน่วยตามแหล่งข้อมูล","stock.peHint":"ราคาต่อกำไร","stock.roeHint":"ผลตอบแทนต่อส่วนผู้ถือหุ้น","stock.metricsTitle":"ตัวชี้วัดทางการเงิน","stock.netMargin":"อัตรากำไรสุทธิ","stock.revenueGrowth":"การเติบโตรายได้ YoY","stock.dividend":"อัตราผลตอบแทนเงินปันผล","stock.metricsFootnote":"ข้อมูลบางรายการขึ้นอยู่กับแพ็กเกจ API และอาจไม่มีสำหรับทุกบริษัท","stock.analysisTitle":"ข้อสังเกตเบื้องต้น","stock.analysisEmpty":"เลือกหุ้นเพื่อดูข้อสังเกตจากตัวชี้วัด","stock.analysisNote":"ไม่ใช่คำแนะนำการลงทุน","stock.dataNote":"ข้อมูลขึ้นอยู่กับสิทธิ์และความพร้อมใช้งานของผู้ให้บริการ",
-    "chart.eyebrow":"06 · PRICE HISTORY","chart.title":"กราฟราคาย้อนหลัง","chart.emptyCaption":"เลือกหุ้นเพื่อดูกราฟรายวัน","chart.rangeLabel":"ช่วงเวลากราฟ","chart.oneMonth":"1 เดือน","chart.threeMonths":"3 เดือน","chart.sixMonths":"6 เดือน","chart.oneYear":"1 ปี","chart.typeLabel":"รูปแบบกราฟ","chart.line":"กราฟเส้น","chart.candles":"แท่งเทียน","chart.candleUnavailable":"ข้อมูลช่วงเวลานี้ไม่มีราคาเปิด/สูงสุด/ต่ำสุดครบสำหรับแท่งเทียน","chart.load":"โหลดกราฟ","chart.placeholder":"กราฟจะแสดงหลังเลือกหุ้น","chart.legend":"● ราคาปิดรายวัน","chart.legendCandles":"แท่งเทียน · เปิด / สูง / ต่ำ / ปิด","chart.export":"ส่งออก CSV",
+    "chart.eyebrow":"PRICE HISTORY","chart.title":"กราฟราคาย้อนหลัง","chart.emptyCaption":"เลือกหุ้นเพื่อดูกราฟรายวัน","chart.rangeLabel":"ช่วงเวลากราฟ","chart.oneMonth":"1 เดือน","chart.threeMonths":"3 เดือน","chart.sixMonths":"6 เดือน","chart.oneYear":"1 ปี","chart.typeLabel":"รูปแบบกราฟ","chart.line":"กราฟเส้น","chart.candles":"แท่งเทียน","chart.candleUnavailable":"ข้อมูลช่วงเวลานี้ไม่มีราคาเปิด/สูงสุด/ต่ำสุดครบสำหรับแท่งเทียน","chart.load":"โหลดกราฟ","chart.placeholder":"กราฟจะแสดงหลังเลือกหุ้น","chart.legend":"● ราคาปิดรายวัน","chart.legendCandles":"แท่งเทียน · เปิด / สูง / ต่ำ / ปิด","chart.export":"ส่งออก CSV",
     "portfolio.addSelected":"เพิ่มเข้าพอร์ต","portfolio.title":"พอร์ตหุ้นที่ถืออยู่","portfolio.description":"บันทึกต้นทุนและติดตามมูลค่าพอร์ตเทียบกับราคาล่าสุด","portfolio.refresh":"อัปเดตราคาจริง","portfolio.cost":"ต้นทุนรวม","portfolio.positionsCount":"จำนวนรายการที่ถือ","portfolio.value":"มูลค่าปัจจุบัน","portfolio.liveQuote":"อ้างอิงราคาล่าสุด","portfolio.unrealized":"กำไร/ขาดทุนที่ยังไม่รับรู้","portfolio.addTitle":"เพิ่มหุ้นที่ซื้อแล้ว","portfolio.symbol":"หุ้น / Ticker","portfolio.symbolPlaceholder":"เช่น AAPL","portfolio.buyPrice":"ราคาซื้อต่อหุ้น","portfolio.buyPricePlaceholder":"ราคาต่อหุ้น","portfolio.quantity":"จำนวนหุ้น","portfolio.quantityPlaceholder":"จำนวน","portfolio.currency":"สกุลเงิน","portfolio.buyDate":"วันที่ซื้อ","portfolio.currencyNote":"กรอกราคาซื้อและเลือกสกุลเงินให้ตรงกับตลาดของหุ้น · ข้อมูลพอร์ตบันทึกในอุปกรณ์นี้","portfolio.add":"เพิ่มเข้าพอร์ต","portfolio.positionsTitle":"รายการที่ถือ","portfolio.currentPrice":"ราคาล่าสุด","portfolio.todayPL":"วันนี้","portfolio.totalPL":"กำไร/ขาดทุน","portfolio.empty":"ยังไม่มีหุ้นในพอร์ต","portfolio.remove":"ลบ","portfolio.openStock":"เปิดข้อมูลหุ้น","portfolio.loading":"กำลังดึงราคาปัจจุบัน…","portfolio.failed":"ดึงราคาปัจจุบันไม่ได้","portfolio.updateTime":"อัปเดตราคาเมื่อ","portfolio.added":"เพิ่มหุ้นเข้าพอร์ตแล้ว","portfolio.invalid":"ตรวจ Ticker ราคา จำนวน และวันที่ซื้อให้ถูกต้อง","portfolio.limit":"เพิ่มหุ้นได้สูงสุด 30 รายการ","portfolio.confirmDelete":"ลบรายการหุ้นนี้ออกจากพอร์ตหรือไม่?","portfolio.holdingDays":"วันที่ถือ",
     "portfolio.currencyMismatch":"สกุลเงินไม่ตรงกับราคาตลาด",
     "watch.title":"รายการติดตาม","watch.description":"เก็บหุ้นที่สนใจไว้เปิดดูได้รวดเร็ว","watch.note":"รายการนี้แยกตาม Workspace และบันทึกในอุปกรณ์นี้","watch.placeholder":"เพิ่มหุ้น เช่น AAPL","watch.empty":"ยังไม่มีหุ้นที่ติดตาม","watch.added":"เพิ่มหุ้นในรายการติดตามแล้ว","watch.exists":"หุ้นนี้อยู่ในรายการติดตามแล้ว","watch.limit":"ติดตามได้สูงสุด 12 หุ้น",
@@ -29,11 +29,11 @@ const I18N = {
     "pulse.title":"Daily market overview","pulse.description":"Prices and daily moves for followed stocks and ETFs","pulse.refresh":"Refresh market","pulse.loadingDate":"Loading…","pulse.connecting":"Loading market data","pulse.loading":"Loading the latest market brief","pulse.loadingPrices":"Loading prices…","pulse.refreshing":"Refreshing prices and market brief","pulse.manualDone":"Updated just now","pulse.cronDone":"Latest scheduled update","pulse.runFailed":"Update failed","pulse.noRun":"No update yet","pulse.pricesFor":"Prices for","pulse.noBrief":"No market data yet","pulse.refreshPrompt":"Refresh the market to fetch prices and create a summary","pulse.noPrices":"No prices to show yet","pulse.errorTitle":"Could not load market overview","pulse.checkServices":"Check Finnhub and Neon connectivity, then try again",
     "news.title":"Market-moving news","news.refresh":"Refresh news","news.loading":"Loading market news…","news.empty":"No notable headlines found recently","news.error":"Could not load market news","news.highImpact":"Macro event","news.companyImpact":"Company news","news.marketWatch":"Market watch","news.topic.rates":"Interest rates","news.topic.inflation":"Inflation","news.topic.economy":"Economy","news.topic.trade":"Trade / policy","news.topic.energy":"Energy / geopolitics","news.topic.company":"Company",
     "movers.title":"Market movers today","movers.description":"Rank ETFs and indices by today’s percentage change","movers.refresh":"Refresh","movers.gainers":"Top gainers","movers.losers":"Top decliners","movers.loading":"Loading market groups…","movers.error":"Could not load market groups","movers.emptyGainers":"No advancing groups in the latest data","movers.emptyLosers":"No declining groups in the latest data","movers.updated":"Updated","movers.up":"Up","movers.down":"Down",
-    "stage.eyebrow":"02 · TREND STAGE","stage.title":"Stock stage analysis","stage.description":"Calculated from weekly closing prices and the 30-week moving average","stage.loading":"Calculating stage…","stage.unavailable":"Fewer than 34 weekly periods are available, so a stage cannot be estimated","stage.figureCaption":"Conceptual illustration, not actual price data","stage.priceLine":"Share price","stage.averageLine":"Long-term average","stage.name1":"Stage 1 · Basing","stage.desc1":"After a decline, price forms a base as the moving average flattens","stage.name2":"Stage 2 · Advancing","stage.desc2":"Price is above a rising moving average","stage.name3":"Stage 3 · Topping","stage.desc3":"The advance slows, price consolidates, and the average flattens","stage.name4":"Stage 4 · Declining","stage.desc4":"Price is below a falling average","stage.priceVsAverage":"Latest price vs 30-week SMA","stage.averageSlope":"SMA slope over 4 weeks","stage.relative":"Return vs SPY over about 30 weeks","stage.above":"Above the average","stage.below":"Below the average","stage.flat":"Average is relatively flat","stage.rising":"Average is rising","stage.falling":"Average is falling","stage.rsUnavailable":"No matching SPY history",
+
     "pulse.symbolsTitle":"Stocks shown in this overview","pulse.symbolsDescription":"Saved per workspace on this device","pulse.symbolsPlaceholder":"Ticker, such as AAPL","pulse.addSymbol":"Add stock","pulse.removeSymbol":"Remove from overview","pulse.invalidSymbol":"Enter a valid ticker","pulse.existsSymbol":"This ticker is already in the list","pulse.symbolLimit":"Choose up to 12 tickers","pulse.noSymbols":"No stocks selected. Add a ticker to start tracking it.","pulse.loadingQuotes":"Loading selected stock prices…","pulse.quoteUnavailable":"Could not load price",
-    "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"Find and research stocks","stocks.description":"See today’s move, year-to-date return, and the selected stock’s price chart.","stocks.searchPlaceholder":"Search a ticker, such as AAPL or MSFT","stocks.search":"Search","stocks.popular":"Popular stocks","stocks.company":"COMPANY OVERVIEW","stock.performanceHeading":"Price and performance","stock.valuationHeading":"Key fundamentals","stock.performanceLabel":"01 · PRICE & PERFORMANCE","stock.valuationLabel":"03 · VALUATION SNAPSHOT","stock.researchLabel":"04 · RESEARCH NOTES","stock.metricsLabel":"05 · FINANCIAL DETAIL",
+    "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"Find and research stocks","stocks.description":"See today’s move, year-to-date return, and the selected stock’s price chart.","stocks.searchPlaceholder":"Search a ticker, such as AAPL or MSFT","stocks.search":"Search","stocks.popular":"Popular stocks","stocks.company":"COMPANY OVERVIEW","stock.valuationHeading":"Key fundamentals","stock.priceSummary":"Stock price summary","stock.researchLabel":"RESEARCH NOTES","stock.metricsLabel":"KEY METRICS",
     "stock.lastPrice":"Latest price","stock.today":"Today’s change","stock.ytd":"Year-to-date change","stock.todayHint":"Compared with the prior close","stock.ytdHint":"Compared with the prior year close","stock.marketCap":"Market cap","stock.marketCapHint":"Units from data source","stock.peHint":"Price to earnings","stock.roeHint":"Return on equity","stock.metricsTitle":"Financial metrics","stock.netMargin":"Net profit margin","stock.revenueGrowth":"Revenue growth YoY","stock.dividend":"Dividend yield","stock.metricsFootnote":"Metric coverage depends on the API plan and company","stock.analysisTitle":"Initial observations","stock.analysisEmpty":"Select a stock to see metric observations","stock.analysisNote":"Not investment advice","stock.dataNote":"Data depends on provider access and availability",
-    "chart.eyebrow":"06 · PRICE HISTORY","chart.title":"Historical price chart","chart.emptyCaption":"Select a stock to see daily prices","chart.rangeLabel":"Chart range","chart.oneMonth":"1 month","chart.threeMonths":"3 months","chart.sixMonths":"6 months","chart.oneYear":"1 year","chart.typeLabel":"Chart type","chart.line":"Line","chart.candles":"Candlesticks","chart.candleUnavailable":"This range does not include complete OHLC data for candlesticks","chart.load":"Load chart","chart.placeholder":"The chart appears after you select a stock","chart.legend":"● Daily close","chart.legendCandles":"Candlesticks · O / H / L / C","chart.export":"Export CSV",
+    "chart.eyebrow":"PRICE HISTORY","chart.title":"Historical price chart","chart.emptyCaption":"Select a stock to see daily prices","chart.rangeLabel":"Chart range","chart.oneMonth":"1 month","chart.threeMonths":"3 months","chart.sixMonths":"6 months","chart.oneYear":"1 year","chart.typeLabel":"Chart type","chart.line":"Line","chart.candles":"Candlesticks","chart.candleUnavailable":"This range does not include complete OHLC data for candlesticks","chart.load":"Load chart","chart.placeholder":"The chart appears after you select a stock","chart.legend":"● Daily close","chart.legendCandles":"Candlesticks · O / H / L / C","chart.export":"Export CSV",
     "portfolio.addSelected":"Add to portfolio","portfolio.title":"Portfolio holdings","portfolio.description":"Record your cost basis and compare holdings with current market prices.","portfolio.refresh":"Refresh live prices","portfolio.cost":"Total cost","portfolio.positionsCount":"Positions","portfolio.value":"Current value","portfolio.liveQuote":"Based on latest quote","portfolio.unrealized":"Unrealized profit / loss","portfolio.addTitle":"Add a holding","portfolio.symbol":"Ticker","portfolio.symbolPlaceholder":"For example, AAPL","portfolio.buyPrice":"Buy price per share","portfolio.buyPricePlaceholder":"Price per share","portfolio.quantity":"Shares","portfolio.quantityPlaceholder":"Quantity","portfolio.currency":"Currency","portfolio.buyDate":"Purchase date","portfolio.currencyNote":"Use the stock’s market currency for the buy price · Portfolio data is saved on this device.","portfolio.add":"Add holding","portfolio.positionsTitle":"Your positions","portfolio.currentPrice":"Latest price","portfolio.todayPL":"Today","portfolio.totalPL":"Profit / loss","portfolio.empty":"No holdings yet","portfolio.remove":"Remove","portfolio.openStock":"Open stock details","portfolio.loading":"Loading current prices…","portfolio.failed":"Could not load current price","portfolio.updateTime":"Prices updated","portfolio.added":"Holding added","portfolio.invalid":"Check the ticker, price, quantity, and purchase date","portfolio.limit":"You can add up to 30 holdings","portfolio.confirmDelete":"Remove this holding from your portfolio?","portfolio.holdingDays":"Days held",
     "portfolio.currencyMismatch":"Currency differs from the market quote",
     "watch.title":"Watchlist","watch.description":"Save stocks you want to open quickly.","watch.note":"Watchlists are separated by workspace and saved on this device.","watch.placeholder":"Add a ticker, such as AAPL","watch.empty":"No stocks in your watchlist yet","watch.added":"Stock added to watchlist","watch.exists":"This stock is already on your watchlist","watch.limit":"You can follow up to 12 stocks",
@@ -129,113 +129,6 @@ function renderCompanyLogo(rawUrl, companyName, symbol) {
     }, { once: true });
     image.src = url.href;
   } catch { /* Keep the ticker monogram when the logo URL is invalid. */ }
-}
-
-function stageWeekKey(candle) {
-  const time = Number(candle?.time);
-  if (!Number.isFinite(time)) return "";
-  const date = new Date(time);
-  if (Number.isNaN(date.getTime())) return "";
-  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
-  return date.toISOString().slice(0, 10);
-}
-
-function weeklyClosingPrices(candles) {
-  const ordered = [...(candles || [])]
-    .filter(row => Number.isFinite(Number(row.time)) && Number.isFinite(Number(row.close)) && Number(row.close) > 0)
-    .sort((a, b) => Number(a.time) - Number(b.time));
-  const byWeek = new Map();
-  for (const row of ordered) {
-    const week = stageWeekKey(row);
-    if (week) byWeek.set(week, { week, close: Number(row.close) });
-  }
-  return [...byWeek.values()];
-}
-
-function renderStageAnalysis(stockCandles, benchmarkCandles) {
-  const host = $("stage-analysis");
-  if (!host) return;
-  const pricePosition = $("stage-price-position");
-  const slopeLabel = $("stage-average-slope");
-  const relativeLabel = $("stage-relative-strength");
-  const badge = $("stage-badge");
-  pricePosition.className = "";
-  slopeLabel.className = "";
-  relativeLabel.className = "";
-  badge.title = "";
-  const ordered = [...(stockCandles || [])]
-    .filter(row => Number.isFinite(Number(row.time)) && Number.isFinite(Number(row.close)) && Number(row.close) > 0)
-    .sort((a, b) => Number(a.time) - Number(b.time));
-  const weekly = weeklyClosingPrices(ordered);
-  for (const element of document.querySelectorAll("[data-stage-definition]")) element.classList.remove("active");
-  host.dataset.stage = "unknown";
-  $("stage-current-title").textContent = "—";
-  pricePosition.textContent = "—";
-  slopeLabel.textContent = "—";
-  relativeLabel.textContent = "—";
-  if (weekly.length < 34) {
-    badge.className = "stage-badge unavailable";
-    badge.textContent = t("stage.unavailable");
-    $("stage-current-description").textContent = t("stage.unavailable");
-    return;
-  }
-
-  const latest = ordered.at(-1);
-  const closes = weekly.map(row => row.close);
-  const sma = end => closes.slice(end - 30, end).reduce((sum, value) => sum + value, 0) / 30;
-  const currentSma = sma(closes.length);
-  const priorSma = sma(closes.length - 4);
-  if (!Number.isFinite(currentSma) || !Number.isFinite(priorSma) || currentSma <= 0 || priorSma <= 0) {
-    badge.className = "stage-badge unavailable";
-    badge.textContent = t("stage.unavailable");
-    $("stage-current-description").textContent = t("stage.unavailable");
-    return;
-  }
-
-  const priceGap = (Number(latest.close) / currentSma - 1) * 100;
-  const slope = (currentSma / priorSma - 1) * 100;
-  const flatBand = 1;
-  const rising = slope > flatBand;
-  const falling = slope < -flatBand;
-  const stage = rising && priceGap >= 0 ? 2 : falling && priceGap < 0 ? 4 : priceGap >= 0 ? 3 : 1;
-  const isEnglish = currentLanguage === "en";
-  const stageName = t(`stage.name${stage}`);
-  host.dataset.stage = String(stage);
-  badge.className = "stage-badge stage-" + stage;
-  badge.textContent = stageName;
-  $("stage-current-title").textContent = stageName;
-  $("stage-current-description").textContent = t(`stage.desc${stage}`);
-  document.querySelector(`[data-stage-definition="${stage}"]`)?.classList.add("active");
-  const gapText = `${priceGap >= 0 ? "+" : ""}${fmt(priceGap, "%")}`;
-  pricePosition.textContent = `${gapText} ${priceGap >= 0 ? t("stage.above") : t("stage.below")}`;
-  pricePosition.className = priceGap >= 0 ? "positive" : "negative";
-  slopeLabel.textContent = `${slope >= 0 ? "+" : ""}${fmt(slope, "%")} · ${rising ? t("stage.rising") : falling ? t("stage.falling") : t("stage.flat")}`;
-  slopeLabel.className = rising ? "positive" : falling ? "negative" : "";
-
-  const stockByWeek = new Map(weekly.map(row => [row.week, row.close]));
-  const benchmark = weeklyClosingPrices(benchmarkCandles);
-  const matching = benchmark.flatMap(row => stockByWeek.has(row.week)
-    ? [{ week: row.week, stock: stockByWeek.get(row.week), spy: row.close }]
-    : []).slice(-30);
-  if (matching.length >= 24) {
-    const first = matching[0];
-    const last = matching.at(-1);
-    const excess = ((last.stock / first.stock - 1) - (last.spy / first.spy - 1)) * 100;
-    relativeLabel.textContent = `${excess >= 0 ? "+" : ""}${fmt(excess, " pp")} ${isEnglish ? "vs SPY" : "เทียบ SPY"}`;
-    relativeLabel.className = excess >= 0 ? "positive" : "negative";
-  } else {
-    relativeLabel.textContent = t("stage.rsUnavailable");
-    relativeLabel.className = "";
-  }
-  badge.title = isEnglish
-    ? `Rule-based estimate from ${weekly.length} weekly closes; 30-week SMA slope over 4 weeks`
-    : `ประเมินตามกติกาจากราคาปิด ${weekly.length} สัปดาห์ ใช้ SMA 30 สัปดาห์และดูความชันย้อนหลัง 4 สัปดาห์`;
-  const markerX = (stage - 0.5) * 190;
-  const markerY = priceGap >= 0 ? 52 : 132;
-  $("stage-marker-line")?.setAttribute("x1", String(markerX));
-  $("stage-marker-line")?.setAttribute("x2", String(markerX));
-  $("stage-marker-dot")?.setAttribute("cx", String(markerX));
-  $("stage-marker-dot")?.setAttribute("cy", String(markerY));
 }
 
 function renderMarketGroups(data = cachedMarketGroups) {
@@ -392,15 +285,6 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
   $("company-name").textContent = t("common.loading");
   $("company-meta").textContent = currentLanguage === "en" ? "Connecting to Finnhub" : "กำลังเชื่อมต่อ Finnhub";
   renderCompanyLogo(null, symbol, symbol);
-  $("stage-analysis").dataset.stage = "unknown";
-  $("stage-badge").className = "stage-badge loading";
-  $("stage-badge").textContent = t("stage.loading");
-  $("stage-current-title").textContent = "—";
-  $("stage-current-description").textContent = t("stage.loading");
-  $("stage-price-position").textContent = "—";
-  $("stage-average-slope").textContent = "—";
-  $("stage-relative-strength").textContent = "—";
-  document.querySelectorAll("[data-stage-definition]").forEach(element => element.classList.remove("active"));
   $("analysis").textContent = currentLanguage === "en" ? "Loading financial metrics…" : "กำลังวิเคราะห์ตัวชี้วัด…";
   $("chart-caption").textContent = `${symbol} · ${currentLanguage === "en" ? "Daily close (Finnhub and fallback providers)" : "ราคาปิดรายวัน (Finnhub และแหล่งข้อมูลสำรอง)"}`;
   $("price-chart").textContent = t("common.loading");
@@ -412,17 +296,13 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
   latestCandles = [];
   if (!preservePage) stockSection.scrollIntoView({ behavior: "smooth", block: "start" });
   void loadChart();
-  void Promise.allSettled([getYearData(symbol), getYearData("SPY")]).then(([stockHistory, spyHistory]) => {
+  void getYearData(symbol).then(history => {
     if (requestId !== stockRequestId) return;
-    if (stockHistory.status === "fulfilled") {
-      latestYearCandles = stockHistory.value.candles || [];
-      activeCurrency = stockHistory.value.currency || activeCurrency;
-      updateYtdChange();
-      renderStageAnalysis(latestYearCandles, spyHistory.status === "fulfilled" ? spyHistory.value.candles : []);
-    } else {
-      updateYtdChange();
-      renderStageAnalysis([], spyHistory.status === "fulfilled" ? spyHistory.value.candles : []);
-    }
+    latestYearCandles = history.candles || [];
+    activeCurrency = history.currency || activeCurrency;
+    updateYtdChange();
+  }).catch(() => {
+    if (requestId === stockRequestId) updateYtdChange();
   });
 
   const [quoteR, profileR, metricsR, analysisR] = await Promise.allSettled([
@@ -961,7 +841,7 @@ async function loadChart() {
   const host = $("price-chart");
   const loadButton = $("chart-load");
   host.textContent = t("common.loading");
-  const days = Number($("chart-range").value);
+  const days = Number(document.querySelector('[data-chart-days][aria-pressed="true"]')?.dataset.chartDays || 365);
   $("export-csv").disabled = true;
   loadButton.disabled = true;
   try {
@@ -1015,7 +895,14 @@ function updateYtdChange() {
   details.textContent = `${currentLanguage === "en" ? "From" : "เทียบกับ"} ${money(basePrice, activeCurrency)} · ${currentLanguage === "en" ? "year end / first available close" : "ราคาปิดสิ้นปีก่อน / วันแรกที่มีข้อมูล"}`;
 }
 $("chart-load")?.addEventListener("click", loadChart);
-$("chart-range")?.addEventListener("change", loadChart);
+document.querySelectorAll("[data-chart-days]").forEach(button => button.addEventListener("click", () => {
+  document.querySelectorAll("[data-chart-days]").forEach(option => {
+    const selected = option === button;
+    option.classList.toggle("active", selected);
+    option.setAttribute("aria-pressed", String(selected));
+  });
+  if (activeSymbol) void loadChart();
+}));
 $("chart-type")?.addEventListener("change", () => {
   if (latestCandles.length) renderChart(latestCandles);
 });
