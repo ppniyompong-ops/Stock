@@ -6,6 +6,8 @@ const I18N = {
     "profile.defaultName":"โปรไฟล์","dashboard.eyebrow":"RESEARCH WITH CONTEXT","dashboard.heroFirst":"เข้าใจธุรกิจ","dashboard.heroSecond":"ก่อนตัดสินใจลงทุน","dashboard.heroDescription":"ดูภาพรวมตลาด ติดตามหุ้น และตรวจผลการลงทุนจากข้อมูลในที่เดียว","dashboard.explore":"เริ่มวิเคราะห์หุ้น",
     "pulse.title":"ภาพรวมตลาดประจำวัน","pulse.description":"ราคาและการเปลี่ยนแปลงของหุ้นกับ ETF ที่ติดตาม","pulse.refresh":"อัปเดตตลาด","pulse.loadingDate":"กำลังโหลด…","pulse.connecting":"กำลังโหลดตลาด","pulse.loading":"กำลังโหลดสรุปตลาดล่าสุด","pulse.loadingPrices":"กำลังโหลดข้อมูลราคา…","pulse.refreshing":"กำลังอัปเดตราคาและสรุปตลาด","pulse.manualDone":"อัปเดตแล้ว","pulse.cronDone":"ข้อมูลจากรอบล่าสุด","pulse.runFailed":"อัปเดตไม่สำเร็จ","pulse.noRun":"ยังไม่มีรอบอัปเดต","pulse.pricesFor":"ข้อมูลวันที่","pulse.noBrief":"ยังไม่มีข้อมูลตลาด","pulse.refreshPrompt":"กดอัปเดตตลาดเพื่อดึงราคาและสร้างสรุป","pulse.noPrices":"ยังไม่มีราคาให้แสดง","pulse.errorTitle":"โหลดภาพรวมตลาดไม่ได้","pulse.checkServices":"ตรวจ Finnhub และการเชื่อมต่อ Neon แล้วลองอีกครั้ง",
     "news.title":"ข่าวที่มีผลต่อตลาด","news.refresh":"อัปเดตข่าว","news.loading":"กำลังโหลดข่าวตลาด…","news.empty":"ยังไม่มีข่าวสำคัญในช่วงนี้","news.error":"โหลดข่าวตลาดไม่ได้","news.highImpact":"ประเด็นมหภาค","news.companyImpact":"ข่าวบริษัท","news.marketWatch":"ติดตามตลาด","news.topic.rates":"ดอกเบี้ย","news.topic.inflation":"เงินเฟ้อ","news.topic.economy":"เศรษฐกิจ","news.topic.trade":"การค้า/นโยบาย","news.topic.energy":"พลังงาน/ภูมิรัฐศาสตร์","news.topic.company":"บริษัท",
+    "movers.title":"กลุ่มมาแรงวันนี้","movers.description":"จัดอันดับ ETF และดัชนีตามการเปลี่ยนแปลงของวันนี้","movers.refresh":"อัปเดต","movers.gainers":"บวกมากสุด","movers.losers":"ลบมากสุด","movers.loading":"กำลังโหลดกลุ่มตลาด…","movers.error":"โหลดข้อมูลกลุ่มตลาดไม่ได้","movers.emptyGainers":"ยังไม่พบกลุ่มที่ปรับขึ้นในข้อมูลล่าสุด","movers.emptyLosers":"ยังไม่พบกลุ่มที่ปรับลงในข้อมูลล่าสุด","movers.updated":"อัปเดตข้อมูล","movers.up":"ขึ้น","movers.down":"ลง",
+    "stage.eyebrow":"TREND STAGE","stage.title":"วิเคราะห์ Stage ของหุ้น","stage.description":"คำนวณจากราคาปิดรายสัปดาห์และเส้นค่าเฉลี่ย 30 สัปดาห์","stage.loading":"กำลังคำนวณ Stage…","stage.unavailable":"ข้อมูลย้อนหลังยังไม่ถึง 34 สัปดาห์ จึงประเมิน Stage ไม่ได้","stage.figureCaption":"ภาพประกอบแนวคิด ไม่ใช่กราฟราคาจริง","stage.priceLine":"ราคาหุ้น","stage.averageLine":"เส้นเฉลี่ยระยะยาว","stage.name1":"Stage 1 · Basing","stage.desc1":"หลังขาลง ราคาเริ่มสร้างฐานและเส้นเฉลี่ยเริ่มแบน","stage.name2":"Stage 2 · Advancing","stage.desc2":"ราคาอยู่เหนือเส้นเฉลี่ยที่กำลังชี้ขึ้น","stage.name3":"Stage 3 · Topping","stage.desc3":"แรงขึ้นเริ่มชะลอ ราคาแกว่งและเส้นเฉลี่ยเริ่มแบน","stage.name4":"Stage 4 · Declining","stage.desc4":"ราคาอยู่ใต้เส้นเฉลี่ยที่กำลังชี้ลง","stage.priceVsAverage":"ราคาล่าสุดเทียบ SMA 30 สัปดาห์","stage.averageSlope":"ความชัน SMA ใน 4 สัปดาห์","stage.relative":"ผลตอบแทนเทียบ SPY ในราว 30 สัปดาห์","stage.above":"เหนือเส้นเฉลี่ย","stage.below":"ใต้เส้นเฉลี่ย","stage.flat":"เส้นเฉลี่ยค่อนข้างแบน","stage.rising":"เส้นเฉลี่ยกำลังชี้ขึ้น","stage.falling":"เส้นเฉลี่ยกำลังชี้ลง","stage.rsUnavailable":"ไม่มีข้อมูล SPY ที่ตรงกัน",
     "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"ค้นหาและวิเคราะห์หุ้น","stocks.description":"เลือกราคา ดูผลต่างวันนี้และตั้งแต่ต้นปี พร้อมกราฟย้อนหลังของหุ้นตัวเดียวกัน","stocks.searchPlaceholder":"ค้นหา Ticker เช่น AAPL, MSFT","stocks.search":"ค้นหา","stocks.popular":"หุ้นยอดนิยม","stocks.company":"COMPANY OVERVIEW",
     "stock.lastPrice":"ราคาล่าสุด","stock.today":"เปลี่ยนแปลงวันนี้","stock.ytd":"เปลี่ยนแปลงปีนี้ (YTD)","stock.todayHint":"เทียบราคาปิดวันก่อน","stock.ytdHint":"เทียบราคาปิดสิ้นปีก่อน","stock.marketCap":"มูลค่าตลาด","stock.marketCapHint":"หน่วยตามแหล่งข้อมูล","stock.peHint":"ราคาต่อกำไร","stock.roeHint":"ผลตอบแทนต่อส่วนผู้ถือหุ้น","stock.metricsTitle":"ตัวชี้วัดทางการเงิน","stock.netMargin":"อัตรากำไรสุทธิ","stock.revenueGrowth":"การเติบโตรายได้ YoY","stock.dividend":"อัตราผลตอบแทนเงินปันผล","stock.metricsFootnote":"ข้อมูลบางรายการขึ้นอยู่กับแพ็กเกจ API และอาจไม่มีสำหรับทุกบริษัท","stock.analysisTitle":"ข้อสังเกตเบื้องต้น","stock.analysisEmpty":"เลือกหุ้นเพื่อดูข้อสังเกตจากตัวชี้วัด","stock.analysisNote":"ไม่ใช่คำแนะนำการลงทุน","stock.dataNote":"ข้อมูลขึ้นอยู่กับสิทธิ์และความพร้อมใช้งานของผู้ให้บริการ",
     "chart.title":"กราฟราคาย้อนหลัง","chart.emptyCaption":"เลือกหุ้นเพื่อดูกราฟรายวัน","chart.rangeLabel":"ช่วงเวลากราฟ","chart.oneMonth":"1 เดือน","chart.threeMonths":"3 เดือน","chart.sixMonths":"6 เดือน","chart.oneYear":"1 ปี","chart.load":"โหลดกราฟ","chart.placeholder":"กราฟจะแสดงหลังเลือกหุ้น","chart.legend":"● ราคาปิดรายวัน","chart.export":"ส่งออก CSV",
@@ -25,6 +27,8 @@ const I18N = {
     "profile.defaultName":"Profile","dashboard.eyebrow":"RESEARCH WITH CONTEXT","dashboard.heroFirst":"Understand the business","dashboard.heroSecond":"before you invest","dashboard.heroDescription":"Review markets, follow stocks, and track investment performance in one place.","dashboard.explore":"Start stock research",
     "pulse.title":"Daily market overview","pulse.description":"Prices and daily moves for followed stocks and ETFs","pulse.refresh":"Refresh market","pulse.loadingDate":"Loading…","pulse.connecting":"Loading market data","pulse.loading":"Loading the latest market brief","pulse.loadingPrices":"Loading prices…","pulse.refreshing":"Refreshing prices and market brief","pulse.manualDone":"Updated just now","pulse.cronDone":"Latest scheduled update","pulse.runFailed":"Update failed","pulse.noRun":"No update yet","pulse.pricesFor":"Prices for","pulse.noBrief":"No market data yet","pulse.refreshPrompt":"Refresh the market to fetch prices and create a summary","pulse.noPrices":"No prices to show yet","pulse.errorTitle":"Could not load market overview","pulse.checkServices":"Check Finnhub and Neon connectivity, then try again",
     "news.title":"Market-moving news","news.refresh":"Refresh news","news.loading":"Loading market news…","news.empty":"No notable headlines found recently","news.error":"Could not load market news","news.highImpact":"Macro event","news.companyImpact":"Company news","news.marketWatch":"Market watch","news.topic.rates":"Interest rates","news.topic.inflation":"Inflation","news.topic.economy":"Economy","news.topic.trade":"Trade / policy","news.topic.energy":"Energy / geopolitics","news.topic.company":"Company",
+    "movers.title":"Market movers today","movers.description":"Rank ETFs and indices by today’s percentage change","movers.refresh":"Refresh","movers.gainers":"Top gainers","movers.losers":"Top decliners","movers.loading":"Loading market groups…","movers.error":"Could not load market groups","movers.emptyGainers":"No advancing groups in the latest data","movers.emptyLosers":"No declining groups in the latest data","movers.updated":"Updated","movers.up":"Up","movers.down":"Down",
+    "stage.eyebrow":"TREND STAGE","stage.title":"Stock stage analysis","stage.description":"Calculated from weekly closing prices and the 30-week moving average","stage.loading":"Calculating stage…","stage.unavailable":"Fewer than 34 weekly periods are available, so a stage cannot be estimated","stage.figureCaption":"Conceptual illustration, not actual price data","stage.priceLine":"Share price","stage.averageLine":"Long-term average","stage.name1":"Stage 1 · Basing","stage.desc1":"After a decline, price forms a base as the moving average flattens","stage.name2":"Stage 2 · Advancing","stage.desc2":"Price is above a rising moving average","stage.name3":"Stage 3 · Topping","stage.desc3":"The advance slows, price consolidates, and the average flattens","stage.name4":"Stage 4 · Declining","stage.desc4":"Price is below a falling average","stage.priceVsAverage":"Latest price vs 30-week SMA","stage.averageSlope":"SMA slope over 4 weeks","stage.relative":"Return vs SPY over about 30 weeks","stage.above":"Above the average","stage.below":"Below the average","stage.flat":"Average is relatively flat","stage.rising":"Average is rising","stage.falling":"Average is falling","stage.rsUnavailable":"No matching SPY history",
     "stocks.eyebrow":"STOCK RESEARCH","stocks.title":"Find and research stocks","stocks.description":"See today’s move, year-to-date return, and the selected stock’s price chart.","stocks.searchPlaceholder":"Search a ticker, such as AAPL or MSFT","stocks.search":"Search","stocks.popular":"Popular stocks","stocks.company":"COMPANY OVERVIEW",
     "stock.lastPrice":"Latest price","stock.today":"Today’s change","stock.ytd":"Year-to-date change","stock.todayHint":"Compared with the prior close","stock.ytdHint":"Compared with the prior year close","stock.marketCap":"Market cap","stock.marketCapHint":"Units from data source","stock.peHint":"Price to earnings","stock.roeHint":"Return on equity","stock.metricsTitle":"Financial metrics","stock.netMargin":"Net profit margin","stock.revenueGrowth":"Revenue growth YoY","stock.dividend":"Dividend yield","stock.metricsFootnote":"Metric coverage depends on the API plan and company","stock.analysisTitle":"Initial observations","stock.analysisEmpty":"Select a stock to see metric observations","stock.analysisNote":"Not investment advice","stock.dataNote":"Data depends on provider access and availability",
     "chart.title":"Historical price chart","chart.emptyCaption":"Select a stock to see daily prices","chart.rangeLabel":"Chart range","chart.oneMonth":"1 month","chart.threeMonths":"3 months","chart.sixMonths":"6 months","chart.oneYear":"1 year","chart.load":"Load chart","chart.placeholder":"The chart appears after you select a stock","chart.legend":"● Daily close","chart.export":"Export CSV",
@@ -59,6 +63,8 @@ let latestQuote = null;
 let activeCurrency = "USD";
 let latestYearCandles = [];
 const yearDataRequests = new Map();
+let cachedMarketGroups = null;
+let activeMoverView = "up";
 
 function toast(message) {
   const el = $("toast");
@@ -93,6 +99,233 @@ async function api(url, options = {}) {
   if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
   return data;
 }
+
+function renderCompanyLogo(rawUrl, companyName, symbol) {
+  const host = $("company-logo");
+  if (!host) return;
+  const label = companyName || symbol || "Stock";
+  const initials = String(label).trim().slice(0, 1).toLocaleUpperCase(currentLanguage === "en" ? "en-US" : "th-TH") || "S";
+  host.replaceChildren();
+  host.classList.remove("has-image");
+  host.textContent = initials;
+  host.title = label;
+  host.setAttribute("aria-label", `${label} logo`);
+  if (!rawUrl) return;
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== "https:" || !/(^|\.)finnhub\.io$/i.test(url.hostname)) return;
+    const image = document.createElement("img");
+    image.alt = `${label} logo`;
+    image.addEventListener("load", () => {
+      host.classList.add("has-image");
+      host.textContent = "";
+      host.append(image);
+    }, { once: true });
+    image.addEventListener("error", () => {
+      host.classList.remove("has-image");
+      host.replaceChildren(document.createTextNode(initials));
+    }, { once: true });
+    image.src = url.href;
+  } catch { /* Keep the ticker monogram when the logo URL is invalid. */ }
+}
+
+function stageWeekKey(candle) {
+  const time = Number(candle?.time);
+  if (!Number.isFinite(time)) return "";
+  const date = new Date(time);
+  if (Number.isNaN(date.getTime())) return "";
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7));
+  return date.toISOString().slice(0, 10);
+}
+
+function weeklyClosingPrices(candles) {
+  const ordered = [...(candles || [])]
+    .filter(row => Number.isFinite(Number(row.time)) && Number.isFinite(Number(row.close)) && Number(row.close) > 0)
+    .sort((a, b) => Number(a.time) - Number(b.time));
+  const byWeek = new Map();
+  for (const row of ordered) {
+    const week = stageWeekKey(row);
+    if (week) byWeek.set(week, { week, close: Number(row.close) });
+  }
+  return [...byWeek.values()];
+}
+
+function renderStageAnalysis(stockCandles, benchmarkCandles) {
+  const host = $("stage-analysis");
+  if (!host) return;
+  const pricePosition = $("stage-price-position");
+  const slopeLabel = $("stage-average-slope");
+  const relativeLabel = $("stage-relative-strength");
+  const badge = $("stage-badge");
+  pricePosition.className = "";
+  slopeLabel.className = "";
+  relativeLabel.className = "";
+  badge.title = "";
+  const ordered = [...(stockCandles || [])]
+    .filter(row => Number.isFinite(Number(row.time)) && Number.isFinite(Number(row.close)) && Number(row.close) > 0)
+    .sort((a, b) => Number(a.time) - Number(b.time));
+  const weekly = weeklyClosingPrices(ordered);
+  for (const element of document.querySelectorAll("[data-stage-definition]")) element.classList.remove("active");
+  host.dataset.stage = "unknown";
+  $("stage-current-title").textContent = "—";
+  pricePosition.textContent = "—";
+  slopeLabel.textContent = "—";
+  relativeLabel.textContent = "—";
+  if (weekly.length < 34) {
+    badge.className = "stage-badge unavailable";
+    badge.textContent = t("stage.unavailable");
+    $("stage-current-description").textContent = t("stage.unavailable");
+    return;
+  }
+
+  const latest = ordered.at(-1);
+  const closes = weekly.map(row => row.close);
+  const sma = end => closes.slice(end - 30, end).reduce((sum, value) => sum + value, 0) / 30;
+  const currentSma = sma(closes.length);
+  const priorSma = sma(closes.length - 4);
+  if (!Number.isFinite(currentSma) || !Number.isFinite(priorSma) || currentSma <= 0 || priorSma <= 0) {
+    badge.className = "stage-badge unavailable";
+    badge.textContent = t("stage.unavailable");
+    $("stage-current-description").textContent = t("stage.unavailable");
+    return;
+  }
+
+  const priceGap = (Number(latest.close) / currentSma - 1) * 100;
+  const slope = (currentSma / priorSma - 1) * 100;
+  const flatBand = 1;
+  const rising = slope > flatBand;
+  const falling = slope < -flatBand;
+  const stage = rising && priceGap >= 0 ? 2 : falling && priceGap < 0 ? 4 : priceGap >= 0 ? 3 : 1;
+  const isEnglish = currentLanguage === "en";
+  const stageName = t(`stage.name${stage}`);
+  host.dataset.stage = String(stage);
+  badge.className = "stage-badge stage-" + stage;
+  badge.textContent = stageName;
+  $("stage-current-title").textContent = stageName;
+  $("stage-current-description").textContent = t(`stage.desc${stage}`);
+  document.querySelector(`[data-stage-definition="${stage}"]`)?.classList.add("active");
+  const gapText = `${priceGap >= 0 ? "+" : ""}${fmt(priceGap, "%")}`;
+  pricePosition.textContent = `${gapText} ${priceGap >= 0 ? t("stage.above") : t("stage.below")}`;
+  pricePosition.className = priceGap >= 0 ? "positive" : "negative";
+  slopeLabel.textContent = `${slope >= 0 ? "+" : ""}${fmt(slope, "%")} · ${rising ? t("stage.rising") : falling ? t("stage.falling") : t("stage.flat")}`;
+  slopeLabel.className = rising ? "positive" : falling ? "negative" : "";
+
+  const stockByWeek = new Map(weekly.map(row => [row.week, row.close]));
+  const benchmark = weeklyClosingPrices(benchmarkCandles);
+  const matching = benchmark.flatMap(row => stockByWeek.has(row.week)
+    ? [{ week: row.week, stock: stockByWeek.get(row.week), spy: row.close }]
+    : []).slice(-30);
+  if (matching.length >= 24) {
+    const first = matching[0];
+    const last = matching.at(-1);
+    const excess = ((last.stock / first.stock - 1) - (last.spy / first.spy - 1)) * 100;
+    relativeLabel.textContent = `${excess >= 0 ? "+" : ""}${fmt(excess, " pp")} ${isEnglish ? "vs SPY" : "เทียบ SPY"}`;
+    relativeLabel.className = excess >= 0 ? "positive" : "negative";
+  } else {
+    relativeLabel.textContent = t("stage.rsUnavailable");
+    relativeLabel.className = "";
+  }
+  badge.title = isEnglish
+    ? `Rule-based estimate from ${weekly.length} weekly closes; 30-week SMA slope over 4 weeks`
+    : `ประเมินตามกติกาจากราคาปิด ${weekly.length} สัปดาห์ ใช้ SMA 30 สัปดาห์และดูความชันย้อนหลัง 4 สัปดาห์`;
+  const markerX = (stage - 0.5) * 190;
+  const markerY = priceGap >= 0 ? 52 : 132;
+  $("stage-marker-line")?.setAttribute("x1", String(markerX));
+  $("stage-marker-line")?.setAttribute("x2", String(markerX));
+  $("stage-marker-dot")?.setAttribute("cx", String(markerX));
+  $("stage-marker-dot")?.setAttribute("cy", String(markerY));
+}
+
+function renderMarketGroups(data = cachedMarketGroups) {
+  const host = $("market-groups-list");
+  if (!host) return;
+  host.replaceChildren();
+  document.querySelectorAll("[data-mover-view]").forEach(tab => {
+    const selected = tab.dataset.moverView === activeMoverView;
+    tab.classList.toggle("active", selected);
+    tab.setAttribute("aria-selected", String(selected));
+  });
+  const validItems = (data?.items || []).filter(item => item.changePercent != null && Number.isFinite(Number(item.changePercent)));
+  const rows = validItems.filter(item => activeMoverView === "up" ? Number(item.changePercent) > 0 : Number(item.changePercent) < 0)
+    .sort((a, b) => activeMoverView === "up" ? Number(b.changePercent) - Number(a.changePercent) : Number(a.changePercent) - Number(b.changePercent))
+    .slice(0, 10);
+  if (!rows.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = data ? t(activeMoverView === "up" ? "movers.emptyGainers" : "movers.emptyLosers") : t("movers.loading");
+    host.append(empty);
+  } else {
+    const maxChange = Math.max(...rows.map(item => Math.abs(Number(item.changePercent))), 0.01);
+    for (const item of rows) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "market-group-row" + (Number(item.changePercent) < 0 ? " loser" : "");
+      button.setAttribute("aria-label", `${item.nameEn} ${item.symbol} · ${currentLanguage === "en" ? item.descriptionEn : item.descriptionTh} · ${Number(item.changePercent) >= 0 ? "+" : ""}${Number(item.changePercent).toFixed(2)}%`);
+      const identity = document.createElement("span");
+      identity.className = "market-group-identity";
+      const ticker = document.createElement("span");
+      ticker.className = "market-group-ticker";
+      ticker.textContent = item.symbol;
+      const details = document.createElement("span");
+      details.className = "market-group-details";
+      const name = document.createElement("strong");
+      name.textContent = item.nameEn;
+      const description = document.createElement("small");
+      description.textContent = currentLanguage === "en" ? item.descriptionEn : item.descriptionTh;
+      details.append(name, description);
+      identity.append(ticker, details);
+      const meter = document.createElement("span");
+      meter.className = "market-group-meter";
+      const fill = document.createElement("span");
+      fill.style.width = `${Math.max(4, Math.abs(Number(item.changePercent)) / maxChange * 100)}%`;
+      meter.append(fill);
+      const change = document.createElement("strong");
+      const amount = Number(item.changePercent);
+      change.className = "market-group-change " + (amount >= 0 ? "positive" : "negative");
+      change.textContent = `${amount >= 0 ? "+" : ""}${amount.toFixed(2)}%`;
+      button.append(identity, meter, change);
+      button.addEventListener("click", () => loadStock(item.symbol));
+      host.append(button);
+    }
+  }
+  const status = $("market-groups-status");
+  if (data?.updatedAt) {
+    const updated = new Date(data.updatedAt);
+    status.textContent = `${t("movers.updated")} · ${Number.isNaN(updated.getTime()) ? "—" : updated.toLocaleTimeString(currentLanguage === "en" ? "en-US" : "th-TH", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" })} · ${validItems.length} ${currentLanguage === "en" ? "groups" : "กลุ่ม"}`;
+  } else if (data?.error) status.textContent = data.error;
+  else status.textContent = "";
+  status.dataset.dynamic = "true";
+}
+
+async function loadMarketGroups(options = {}) {
+  const button = $("market-groups-refresh");
+  if (button) button.disabled = true;
+  if (!cachedMarketGroups) renderMarketGroups(null);
+  try {
+    cachedMarketGroups = await api(`/api/market-groups${options.refresh ? "?refresh=1" : ""}`);
+    renderMarketGroups(cachedMarketGroups);
+  } catch (error) {
+    if (cachedMarketGroups) {
+      renderMarketGroups(cachedMarketGroups);
+      $("market-groups-status").textContent = error.message;
+    } else {
+      renderMarketGroups(null);
+      const host = $("market-groups-list");
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = `${t("movers.error")}: ${error.message}`;
+      host.replaceChildren(empty);
+    }
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+document.querySelectorAll("[data-mover-view]").forEach(tab => tab.addEventListener("click", () => {
+  activeMoverView = tab.dataset.moverView === "down" ? "down" : "up";
+  renderMarketGroups();
+}));
+$("market-groups-refresh")?.addEventListener("click", () => loadMarketGroups({ refresh: true }));
 function showResults(items) {
   resultsBox.innerHTML = "";
   if (!items.length) {
@@ -156,6 +389,16 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
   $("stock-symbol").textContent = symbol;
   $("company-name").textContent = t("common.loading");
   $("company-meta").textContent = currentLanguage === "en" ? "Connecting to Finnhub" : "กำลังเชื่อมต่อ Finnhub";
+  renderCompanyLogo(null, symbol, symbol);
+  $("stage-analysis").dataset.stage = "unknown";
+  $("stage-badge").className = "stage-badge loading";
+  $("stage-badge").textContent = t("stage.loading");
+  $("stage-current-title").textContent = "—";
+  $("stage-current-description").textContent = t("stage.loading");
+  $("stage-price-position").textContent = "—";
+  $("stage-average-slope").textContent = "—";
+  $("stage-relative-strength").textContent = "—";
+  document.querySelectorAll("[data-stage-definition]").forEach(element => element.classList.remove("active"));
   $("analysis").textContent = currentLanguage === "en" ? "Loading financial metrics…" : "กำลังวิเคราะห์ตัวชี้วัด…";
   $("chart-caption").textContent = `${symbol} · ${currentLanguage === "en" ? "Daily close (Finnhub and fallback providers)" : "ราคาปิดรายวัน (Finnhub และแหล่งข้อมูลสำรอง)"}`;
   $("price-chart").textContent = t("common.loading");
@@ -165,13 +408,17 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
   latestCandles = [];
   if (!preservePage) stockSection.scrollIntoView({ behavior: "smooth", block: "start" });
   void loadChart();
-  void getYearData(symbol).then(data => {
-    if (symbol !== activeSymbol) return;
-    latestYearCandles = data.candles || [];
-    activeCurrency = data.currency || activeCurrency;
-    updateYtdChange();
-  }).catch(() => {
-    if (symbol === activeSymbol) updateYtdChange();
+  void Promise.allSettled([getYearData(symbol), getYearData("SPY")]).then(([stockHistory, spyHistory]) => {
+    if (requestId !== stockRequestId) return;
+    if (stockHistory.status === "fulfilled") {
+      latestYearCandles = stockHistory.value.candles || [];
+      activeCurrency = stockHistory.value.currency || activeCurrency;
+      updateYtdChange();
+      renderStageAnalysis(latestYearCandles, spyHistory.status === "fulfilled" ? spyHistory.value.candles : []);
+    } else {
+      updateYtdChange();
+      renderStageAnalysis([], spyHistory.status === "fulfilled" ? spyHistory.value.candles : []);
+    }
   });
 
   const [quoteR, profileR, metricsR, analysisR] = await Promise.allSettled([
@@ -189,6 +436,7 @@ async function loadStock(rawSymbol, { preservePage = false } = {}) {
   latestQuote = quote;
   activeCurrency = profile?.currency || activeCurrency;
   $("company-name").textContent = profile?.name || symbol;
+  renderCompanyLogo(profile?.logo, profile?.name || symbol, symbol);
   $("company-meta").textContent = [profile?.exchange, profile?.industry, profile?.country].filter(Boolean).join(" · ") || (currentLanguage === "en" ? "Company profile unavailable for this ticker" : "ข้อมูลบริษัทไม่มีในแผน API หรือไม่รองรับ Ticker นี้");
   $("price").textContent = quote ? money(quote.price, profile?.currency || "USD") : t("common.noData");
   const change = quote?.changePercent;
@@ -744,6 +992,7 @@ $("setting-language")?.addEventListener("change", event => {
   applyLanguage(event.target.value);
   renderWatchlist(); renderAlerts(); void renderPortfolio(); renderProfile();
   if (activeSymbol) void loadStock(activeSymbol, { preservePage: true });
+  renderMarketGroups();
   void loadMarketPulse();
   renderMarketNews(cachedMarketNews);
   renderIntegrationStatus(cachedIntegrationStatus);
@@ -865,6 +1114,7 @@ async function loadMarketPulse(options = {}) {
 
 $("pulse-refresh")?.addEventListener("click", () => loadMarketPulse({ refresh: true }));
 loadMarketPulse();
+loadMarketGroups();
 
 function formatNewsTime(timestamp) {
   const date = new Date(Number(timestamp) * 1000);

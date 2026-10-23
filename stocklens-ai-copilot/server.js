@@ -372,6 +372,109 @@ app.get("/api/quote/:symbol", async (req, res) => {
   }
 });
 
+const MARKET_GROUPS = [
+  ["XLC", "Communication Services", "บริการสื่อสาร", "Communication services", "บริการสื่อสาร"],
+  ["XLY", "Consumer Discretionary", "สินค้าอุปโภคบริโภคฟุ่มเฟือย", "Consumer discretionary", "สินค้าอุปโภคบริโภคฟุ่มเฟือย"],
+  ["XLP", "Consumer Staples", "สินค้าอุปโภคบริโภคจำเป็น", "Consumer staples", "สินค้าอุปโภคบริโภคจำเป็น"],
+  ["XLE", "Energy", "พลังงาน", "Energy", "พลังงาน"],
+  ["XLF", "Financials", "การเงิน", "Financials", "การเงิน"],
+  ["XLV", "Health Care", "การแพทย์", "Health care", "การแพทย์"],
+  ["XLI", "Industrials", "อุตสาหกรรม", "Industrials", "อุตสาหกรรม"],
+  ["XLB", "Materials", "วัสดุ", "Materials", "วัสดุ"],
+  ["XLRE", "Real Estate", "อสังหาริมทรัพย์", "Real estate", "อสังหาริมทรัพย์"],
+  ["XLU", "Utilities", "สาธารณูปโภค", "Utilities", "สาธารณูปโภค"],
+  ["XLK", "Technology", "เทคโนโลยี", "Technology", "เทคโนโลยี"],
+  ["SPY", "S&P 500", "ดัชนี S&P 500", "S&P 500 index", "ดัชนี S&P 500"],
+  ["QQQ", "Nasdaq 100", "หุ้น Nasdaq 100", "Nasdaq 100", "หุ้น Nasdaq 100"],
+  ["DIA", "Dow Jones 30", "ดาวโจนส์ 30", "Dow Jones 30", "ดาวโจนส์ 30"],
+  ["IWM", "Russell 2000", "หุ้นขนาดเล็ก", "Russell 2000 small caps", "หุ้นขนาดเล็ก"],
+  ["VT", "Total World", "หุ้นทั่วโลก", "Total world stocks", "หุ้นทั่วโลก"],
+  ["TLT", "US Treasury 20Y+", "พันธบัตรรัฐบาลสหรัฐฯ 20 ปีขึ้นไป", "US Treasury bonds 20Y+", "พันธบัตรรัฐบาลสหรัฐฯ 20 ปีขึ้นไป"],
+  ["GLD", "Gold", "ทองคำ", "Gold", "ทองคำ"],
+  ["SMH", "Semiconductors", "เซมิคอนดักเตอร์", "Semiconductors", "เซมิคอนดักเตอร์"],
+  ["BUG", "Cybersecurity", "ความปลอดภัยไซเบอร์", "Cybersecurity", "ความปลอดภัยไซเบอร์"],
+  ["IGV", "Software", "ซอฟต์แวร์", "Software", "ซอฟต์แวร์"],
+  ["XBI", "Biotechnology", "เทคโนโลยีชีวภาพ", "Biotechnology", "เทคโนโลยีชีวภาพ"],
+  ["TAN", "Solar", "พลังงานแสงอาทิตย์", "Solar energy", "พลังงานแสงอาทิตย์"],
+  ["NLR", "Nuclear Energy", "พลังงานนิวเคลียร์", "Nuclear energy", "พลังงานนิวเคลียร์"],
+  ["ARKX", "Space Exploration", "เทคโนโลยีอวกาศ", "Space exploration", "เทคโนโลยีอวกาศ"],
+  ["IBIT", "Bitcoin ETF", "กองทุน Bitcoin", "Bitcoin ETF", "กองทุน Bitcoin"],
+  ["MAGS", "Magnificent Seven", "หุ้น 7 นางฟ้า", "Magnificent Seven stocks", "หุ้น 7 นางฟ้า"]
+];
+let marketGroupsInFlight = null;
+
+app.get("/api/market-groups", async (req, res) => {
+  const cacheKey = "market-groups:v1";
+  const forceRefresh = req.query.refresh === "1";
+  const saved = forceRefresh ? null : cached(cacheKey);
+  if (saved) return res.json(saved);
+  const key = process.env.FINNHUB_API_KEY;
+  if (!key) return res.status(503).json({ error: "ยังไม่ได้ตั้งค่า Finnhub API Key" });
+  if (marketGroupsInFlight) {
+    try { return res.json(await marketGroupsInFlight); }
+    catch (error) { return res.status(error.status || 502).json({ error: error.message }); }
+  }
+
+  marketGroupsInFlight = (async () => {
+  const quotes = new Map();
+  let nextIndex = 0;
+  let rateLimited = false;
+  const worker = async () => {
+    while (nextIndex < MARKET_GROUPS.length && !rateLimited) {
+      const index = nextIndex++;
+      const [symbol] = MARKET_GROUPS[index];
+      const existing = forceRefresh ? null : cached(`quote:${symbol}`);
+      if (existing && existing.changePercent != null && Number.isFinite(Number(existing.changePercent))) {
+        quotes.set(symbol, existing);
+        continue;
+      }
+      try {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const url = new URL("https://finnhub.io/api/v1/quote");
+        url.searchParams.set("symbol", symbol);
+        url.searchParams.set("token", key);
+        const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (response.status === 429) { rateLimited = true; continue; }
+        if (!response.ok) continue;
+        const q = await response.json();
+        if (!q || q.dp == null || q.c == null || !Number.isFinite(Number(q.dp)) || !Number.isFinite(Number(q.c))) continue;
+        const result = {
+          symbol, price: Number(q.c), change: Number(q.d), changePercent: Number(q.dp),
+          high: Number(q.h), low: Number(q.l), open: Number(q.o), previousClose: Number(q.pc),
+          timestamp: q.t ? new Date(q.t * 1000).toISOString() : null, source: "Finnhub"
+        };
+        setCache(`quote:${symbol}`, result);
+        quotes.set(symbol, result);
+      } catch (error) {
+        console.warn(`Market group quote unavailable for ${symbol}:`, error.message);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: 4 }, () => worker()));
+
+  const items = MARKET_GROUPS.flatMap(([symbol, nameEn, nameTh, descriptionEn, descriptionTh]) => {
+    const quote = quotes.get(symbol);
+    if (!quote) return [];
+    return [{
+      symbol, nameEn, nameTh, descriptionEn, descriptionTh,
+      price: quote.price, change: quote.change, changePercent: quote.changePercent,
+      timestamp: quote.timestamp, source: quote.source
+    }];
+  });
+  if (!items.length) {
+    const error = new Error(rateLimited ? "Finnhub rate limit เต็ม กรุณารอสักครู่แล้วลองใหม่" : "Finnhub ไม่มีข้อมูลราคาของกลุ่มตลาดในขณะนี้");
+    error.status = rateLimited ? 429 : 502;
+    throw error;
+  }
+  const result = { items, updatedAt: new Date().toISOString(), source: "Finnhub" };
+  setCache(cacheKey, result, 5 * 60_000);
+  return result;
+  })();
+  try { res.json(await marketGroupsInFlight); }
+  catch (error) { res.status(error.status || 502).json({ error: error.message || "Finnhub ไม่มีข้อมูลกลุ่มตลาด" }); }
+  finally { marketGroupsInFlight = null; }
+});
+
 app.get("/api/profile/:symbol", async (req, res) => {
   const symbol = String(req.params.symbol || "").trim().toUpperCase();
   if (!validSymbol(symbol)) return res.status(400).json({ error: "Ticker ไม่ถูกต้อง" });
