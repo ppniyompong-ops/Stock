@@ -90,14 +90,19 @@ async function createDailyBrief(quotes, asOfDate) {
           parts: [{ text: "คุณเป็นผู้ช่วยสรุปข้อมูลตลาดหุ้นภาษาไทย สรุปเฉพาะข้อมูลที่ได้รับ ไม่แต่งตัวเลขหรือข่าว บอกว่าข้อมูลราคาเป็น snapshot จาก Finnhub ณ เวลาที่ระบุ แบ่งเป็นภาพรวมสั้น ๆ จุดที่เปลี่ยนแปลงเด่น และสิ่งที่ควรตรวจสอบต่อ ห้ามให้คำแนะนำซื้อขายหรือคาดการณ์ผลตอบแทน" }]
         },
         contents: [{ role: "user", parts: [{ text: `สรุปข้อมูล snapshot วันที่ ${asOfDate} ต่อไปนี้ให้เข้าใจง่าย ความยาวไม่เกิน 5 bullet:\n${JSON.stringify(data)}` }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 700 }
+        // Gemini 3.5 Flash-Lite no longer accepts legacy sampling parameters
+        // such as temperature. Keep only the output limit for model compatibility.
+        generationConfig: { maxOutputTokens: 700 }
       }),
       signal: AbortSignal.timeout(25_000)
     }
   );
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(response.status === 429 ? "Gemini rate limit reached" : `Gemini returned ${response.status}`);
+    const detail = String(payload.error?.message || "").replace(/\s+/g, " ").slice(0, 240);
+    throw new Error(response.status === 429
+      ? `Gemini rate limit reached${detail ? `: ${detail}` : ""}`
+      : `Gemini returned ${response.status}${detail ? `: ${detail}` : ""}`);
   }
   const summary = (payload.candidates?.[0]?.content?.parts || []).map((part) => part.text || "").join("\n").trim();
   if (!summary) throw new Error("Gemini returned an empty market brief");
@@ -108,11 +113,6 @@ async function main() {
   let runId = null;
   const started = new Date();
   const asOfDate = started.toISOString().slice(0, 10);
-  const symbols = symbolsToUpdate();
-
-  if (!process.env.FINNHUB_API_KEY) throw new Error("FINNHUB_API_KEY is required");
-  if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is required");
-  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
 
   try {
     await ensureSchema();
@@ -121,6 +121,10 @@ async function main() {
       [JOB_NAME]
     );
     runId = runResult.rows[0].id;
+
+    const symbols = symbolsToUpdate();
+    if (!process.env.FINNHUB_API_KEY) throw new Error("FINNHUB_API_KEY is required on the Cron service");
+    if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is required on the Cron service");
 
     const quotes = [];
     const failures = [];

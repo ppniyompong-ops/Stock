@@ -18,6 +18,8 @@
 
 `render.yaml` สร้าง Web Service และ Cron Job แยกกัน งาน cron รัน `npm run cron:market-pulse` เวลา 01:30 UTC วันจันทร์ถึงศุกร์ (08:30 น. เวลาไทย) โดยดึงราคา Finnhub, สร้างสรุปภาษาไทยด้วย Gemini และ upsert ข้อมูลลง Neon จึงรันซ้ำในวันเดียวกันได้
 
+Cron Job ต้องมี `FINNHUB_API_KEY`, `GEMINI_API_KEY` และ `DATABASE_URL` ใน Environment ของ service Cron แยกจาก Web Service; Render Cron ไม่มีแผนฟรีและมีค่าบริการขั้นต่ำ $1/เดือน หากยังไม่มีประวัติการรัน ให้ตรวจว่ามี service `stocklens-market-pulse` และกด Trigger Run ในหน้า Runs ของ Render เพื่อเริ่มรอบแรก
+
 ใน Render ให้ตั้ง Root Directory เป็น `stocklens-ai-copilot`; Build Command ใช้ `npm install` เพราะไฟล์แอปอยู่ใน Git repository แล้ว ไม่ต้องอัปโหลดหรือแตก ZIP ระหว่าง build
 
 ใส่ `FINNHUB_API_KEY`, `GEMINI_API_KEY` และ `DATABASE_URL` ให้ทั้ง Web Service และ Cron Job ใน Render Environment; ใช้ `GEMINI_MODEL` และ `MARKET_SYMBOLS` เพื่อปรับโมเดล/หุ้นที่ติดตาม งาน cron ต้องจบด้วย exit code เพื่อให้ Render บันทึกผลสำเร็จหรือล้มเหลว

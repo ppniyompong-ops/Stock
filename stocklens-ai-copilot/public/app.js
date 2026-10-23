@@ -503,19 +503,24 @@ async function loadMarketPulse() {
     status.className = "pulse-status " + (run?.status === "succeeded" ? "success" : run?.status === "failed" ? "failed" : "pending");
     status.textContent = run?.status === "succeeded"
       ? "Cron สำเร็จ · " + (run.finished_at ? new Date(run.finished_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" }) : "")
-      : run?.status === "failed" ? "Cron รอบล่าสุดไม่สำเร็จ" : "รอ cron ทำงานรอบแรก";
+      : run?.status === "failed" ? "Cron รอบล่าสุดไม่สำเร็จ" : "ยังไม่พบประวัติ Cron";
 
     if (!data.available || !data.brief) {
-      $("pulse-date").textContent = "ยังไม่มีสรุปตลาด";
-      summary.textContent = "เมื่อกำหนด Finnhub, Gemini และ Neon แล้ว งาน cron จะดึง snapshot และสร้างสรุปตลาดให้อัตโนมัติ";
+      $("pulse-date").textContent = data.snapshotDate
+        ? "ข้อมูลราคาวันที่ " + formatPulseDate(data.snapshotDate)
+        : "ยังไม่มีสรุปตลาด";
+      summary.textContent = run?.status === "failed"
+        ? `Cron ทำงานไม่สำเร็จ: ${run.error || "เปิด Render Logs ของ stocklens-market-pulse เพื่อตรวจสาเหตุ"}`
+        : data.snapshots?.length
+          ? "มี snapshot ราคาแล้ว แต่ยังไม่มีสรุป Gemini สำหรับวันนี้"
+          : "ยังไม่พบประวัติการรัน Cron ตรวจว่า Render มี service stocklens-market-pulse และตั้ง FINNHUB_API_KEY, GEMINI_API_KEY, DATABASE_URL ไว้ใน service นี้ครบแล้ว";
       $("pulse-model").textContent = "";
-      snapshots.innerHTML = '<div class="empty-state">ข้อมูลราคาจะปรากฏหลัง cron ทำงานสำเร็จ</div>';
-      return;
+    } else {
+      $("pulse-date").textContent = "ข้อมูลวันที่ " + formatPulseDate(data.brief.as_of_date);
+      summary.textContent = data.brief.summary;
+      $("pulse-model").textContent = data.brief.symbols_count + " Ticker · " + data.brief.model + " · สร้างเมื่อ " + new Date(data.brief.generated_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
     }
 
-    $("pulse-date").textContent = "ข้อมูลวันที่ " + formatPulseDate(data.brief.as_of_date);
-    summary.textContent = data.brief.summary;
-    $("pulse-model").textContent = data.brief.symbols_count + " Ticker · " + data.brief.model + " · สร้างเมื่อ " + new Date(data.brief.generated_at).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
     snapshots.replaceChildren();
     for (const item of data.snapshots || []) {
       const card = document.createElement("article");
@@ -538,7 +543,11 @@ async function loadMarketPulse() {
       card.append(heading, price, detail);
       snapshots.append(card);
     }
-    if (!snapshots.childElementCount) snapshots.innerHTML = '<div class="empty-state">รอบล่าสุดไม่มีข้อมูลราคา</div>';
+    if (!snapshots.childElementCount) {
+      snapshots.innerHTML = run?.status === "failed"
+        ? '<div class="empty-state">Cron ไม่ได้บันทึกราคา ตรวจข้อความ error และ Environment ของ service</div>'
+        : '<div class="empty-state">ข้อมูลราคาจะปรากฏหลัง cron ทำงานสำเร็จ</div>';
+    }
   } catch (error) {
     $("pulse-date").textContent = "อ่านข้อมูลตลาดไม่สำเร็จ";
     $("pulse-status").className = "pulse-status failed";

@@ -142,18 +142,31 @@ app.get("/api/market-pulse", async (_req, res) => {
     const brief = briefResult.rows[0] || null;
     const snapshotsResult = brief
       ? await query(
-          `SELECT symbol, price, change, change_percent, day_high, day_low,
+          `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
                   day_open, previous_close, quote_time, captured_at
            FROM market_snapshots WHERE as_of_date = $1 ORDER BY symbol`,
           [brief.as_of_date]
         )
-      : { rows: [] };
+      : await query(
+          `SELECT as_of_date, symbol, price, change, change_percent, day_high, day_low,
+                  day_open, previous_close, quote_time, captured_at
+           FROM market_snapshots
+           WHERE as_of_date = (SELECT MAX(as_of_date) FROM market_snapshots)
+           ORDER BY symbol`
+        );
     const runResult = await query(
       `SELECT status, started_at, finished_at, error
        FROM cron_runs WHERE job_name = 'market-pulse'
        ORDER BY started_at DESC LIMIT 1`
     );
-    res.json({ available: Boolean(brief), brief, snapshots: snapshotsResult.rows, lastRun: runResult.rows[0] || null });
+    const snapshots = snapshotsResult.rows;
+    res.json({
+      available: Boolean(brief),
+      brief,
+      snapshots,
+      snapshotDate: brief?.as_of_date || snapshots[0]?.as_of_date || null,
+      lastRun: runResult.rows[0] || null
+    });
   } catch (error) {
     console.error("Market pulse error:", error.message);
     res.status(503).json({ error: "อ่านสรุปตลาดจาก Neon ไม่สำเร็จ กรุณาตรวจการตั้งค่า DATABASE_URL" });
