@@ -79,8 +79,10 @@ async function fetchFinnhubCandles(symbol, from, to, key) {
 }
 
 async function fetchYahooCandles(symbol, from, to) {
-  // Yahoo Finance uses hyphens for share classes (for example BRK-B).
-  const yahooSymbol = symbol.replace(/\./g, "-");
+  // Yahoo uses dots for exchange suffixes (for example PTT.BK) but hyphens for share classes (for example BRK-B).
+  const exchangeSuffixes = new Set(["AS", "AX", "BE", "BK", "BO", "CN", "CO", "DE", "DU", "F", "HE", "HK", "IC", "IR", "IS", "JK", "JO", "KL", "KS", "KQ", "L", "MI", "MX", "NE", "NS", "NZ", "OL", "PA", "PS", "QA", "SA", "SG", "SI", "SR", "ST", "SW", "T", "TA", "TO", "TW", "V", "VN", "WA"]);
+  const suffix = symbol.match(/\.([A-Z]{1,3})$/)?.[1];
+  const yahooSymbol = symbol.includes(".") && !exchangeSuffixes.has(suffix) ? symbol.replace(/\./g, "-") : symbol;
   const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}`);
   url.searchParams.set("period1", String(from));
   url.searchParams.set("period2", String(to));
@@ -105,6 +107,130 @@ async function fetchYahooCandles(symbol, from, to) {
   })).filter((item, index) => quote.close[index] != null && Number.isFinite(item.time) && Number.isFinite(item.close));
   if (!candles.length) throw new Error("Yahoo Finance returned no usable daily history");
   return candles;
+}
+
+const STAGE_CACHE_TTL_MS = 6 * 60 * 60_000;
+const stageHistoryInFlight = new Map();
+async function fetchStageHistory(symbol) {
+  const cacheKey = `stage-history:${symbol}`;
+  const saved = cached(cacheKey);
+  if (saved) return saved;
+  if (stageHistoryInFlight.has(symbol)) return stageHistoryInFlight.get(symbol);
+  const pending = (async () => {
+    const to = Math.floor(Date.now() / 1000);
+    const from = to - 420 * 86400;
+    const key = process.env.FINNHUB_API_KEY;
+    let candles;
+    let source;
+    try {
+      candles = await fetchYahooCandles(symbol, from, to);
+      source = "Yahoo Finance";
+    } catch (yahooError) {
+      if (!key) throw yahooError;
+      candles = await fetchFinnhubCandles(symbol, from, to, key);
+      source = "Finnhub";
+    }
+    const result = { candles, source };
+    setCache(cacheKey, result, STAGE_CACHE_TTL_MS);
+    return result;
+  })();
+  stageHistoryInFlight.set(symbol, pending);
+  try { return await pending; }
+  finally { stageHistoryInFlight.delete(symbol); }
+}
+
+function weeklyCloses(candles) {
+  const weeks = new Map();
+  for (const candle of [...candles].sort((a, b) => Number(a.time) - Number(b.time))) {
+    const date = new Date(Number(candle.time));
+    if (!Number.isFinite(date.getTime()) || !Number.isFinite(Number(candle.close))) continue;
+    const weekday = date.getUTCDay() || 7;
+    const monday = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - weekday + 1);
+    const previous = weeks.get(monday);
+    if (!previous || Number(candle.time) > previous.time) weeks.set(monday, { time: Number(candle.time), week: monday, close: Number(candle.close) });
+  }
+  return [...weeks.values()].sort((a, b) => a.week - b.week);
+}
+
+function averageAt(values, endIndex, period = 30) {
+  const start = endIndex - period + 1;
+  if (start < 0 || endIndex >= values.length) return null;
+  const window = values.slice(start, endIndex + 1);
+  return window.length === period ? window.reduce((sum, value) => sum + value, 0) / period : null;
+}
+
+function calculateWeinsteinStage(symbol, stockCandles, benchmarkCandles) {
+  const weeks = weeklyCloses(stockCandles);
+  const closes = weeks.map(item => item.close);
+  const missing = (reason, weeklyBars = weeks.length) => ({
+    symbol, stage: null, status: "insufficient", reason,
+    weeklyBars, source: "30-week SMA + relative strength vs SPY"
+  });
+  if (weeks.length < 34) return missing("Need at least 34 weekly closes to calculate the 30-week average and its four-week slope.");
+
+  const latestIndex = weeks.length - 1;
+  const latestClose = closes[latestIndex];
+  const sma30 = averageAt(closes, latestIndex);
+  const priorSma30 = averageAt(closes, latestIndex - 4);
+  const priorTrendSma30 = averageAt(closes, latestIndex - 8);
+  if (!(sma30 > 0) || !(priorSma30 > 0)) return missing("Not enough valid weekly closes for a 30-week average.");
+
+  const distancePercent = (latestClose / sma30 - 1) * 100;
+  const slopePercent4w = (sma30 / priorSma30 - 1) * 100;
+  const priorTrendPercent8w = priorTrendSma30 > 0 ? (sma30 / priorTrendSma30 - 1) * 100 : null;
+  const slopeThreshold = 0.5;
+  let stage = null;
+  if (distancePercent >= 0 && slopePercent4w >= slopeThreshold) stage = 2;
+  else if (distancePercent <= 0 && slopePercent4w <= -slopeThreshold) stage = 4;
+  else if (priorTrendPercent8w !== null) stage = priorTrendPercent8w >= 0 ? 3 : 1;
+
+  let mansfieldRsPercent = null;
+  let relativeStrengthWeeks = 0;
+  if (Array.isArray(benchmarkCandles)) {
+    const benchmarkByWeek = new Map(weeklyCloses(benchmarkCandles).map(item => [item.week, item.close]));
+    const ratios = weeks.flatMap(item => {
+      const benchmarkClose = benchmarkByWeek.get(item.week);
+      return benchmarkClose > 0 ? [item.close / benchmarkClose] : [];
+    });
+    const lookback = ratios.slice(-52);
+    relativeStrengthWeeks = lookback.length;
+    if (lookback.length >= 30) {
+      const ratioAverage = lookback.reduce((sum, value) => sum + value, 0) / lookback.length;
+      if (ratioAverage > 0) mansfieldRsPercent = (lookback[lookback.length - 1] / ratioAverage - 1) * 100;
+    }
+  }
+
+  return {
+    symbol, stage, status: stage ? "ready" : "insufficient",
+    latestClose, sma30, distancePercent, slopePercent4w, priorTrendPercent8w,
+    mansfieldRsPercent, relativeStrengthWeeks, weeklyBars: weeks.length,
+    asOf: weeks[latestIndex].time ? new Date(weeks[latestIndex].time).toISOString() : null,
+    method: "30-week simple moving average; four-week slope; Mansfield-style relative strength vs SPY",
+    note: "Rule-based estimate from weekly closes. It does not confirm base structure, breakout volume, or market breadth."
+  };
+}
+
+const stageAnalysisInFlight = new Map();
+async function getWeinsteinStage(symbol) {
+  const cacheKey = `stage-analysis:${symbol}`;
+  const saved = cached(cacheKey);
+  if (saved) return saved;
+  if (stageAnalysisInFlight.has(symbol)) return stageAnalysisInFlight.get(symbol);
+  const pending = (async () => {
+    const stock = await fetchStageHistory(symbol);
+    let benchmark = null;
+    if (symbol !== "SPY") {
+      try { benchmark = await fetchStageHistory("SPY"); }
+      catch (error) { console.warn("SPY stage benchmark unavailable:", error.message); }
+    }
+    const result = calculateWeinsteinStage(symbol, stock.candles, benchmark?.candles || null);
+    result.historySource = stock.source;
+    setCache(cacheKey, result, STAGE_CACHE_TTL_MS);
+    return result;
+  })();
+  stageAnalysisInFlight.set(symbol, pending);
+  try { return await pending; }
+  finally { stageAnalysisInFlight.delete(symbol); }
 }
 
 app.get("/api/health", async (_req, res) => {
@@ -321,6 +447,17 @@ app.get("/api/candles/:symbol", async (req, res) => {
         ? "ดึงกราฟไม่สำเร็จทั้งจาก Finnhub และแหล่งข้อมูลสำรอง ตรวจ Ticker แล้วลองใหม่"
         : "ดึงกราฟจากแหล่งข้อมูลสำรองไม่สำเร็จ ตรวจ Ticker แล้วลองใหม่"
     });
+  }
+});
+
+app.get("/api/stage/:symbol", async (req, res) => {
+  const symbol = String(req.params.symbol || "").trim().toUpperCase();
+  if (!validSymbol(symbol)) return res.status(400).json({ error: "Ticker ไม่ถูกต้อง" });
+  try {
+    res.json(await getWeinsteinStage(symbol));
+  } catch (error) {
+    console.error(`Stage analysis failed for ${symbol}:`, error.message);
+    res.status(502).json({ error: "คำนวณ Stage ไม่สำเร็จ เพราะโหลดข้อมูลรายสัปดาห์ไม่ได้" });
   }
 });
 
@@ -615,26 +752,130 @@ app.get("/api/analysis/:symbol", async (req, res) => {
 
 // Stock Co-Pilot: real Gemini LLM. The key stays server-side only.
 const chatWindows = new Map();
+const COPILOT_NON_TICKERS = new Set([
+  "A", "I", "AI", "ALL", "AM", "AN", "AND", "ARE", "AS", "AT", "BE", "BUY", "BY", "CAN", "CEO", "DAY", "DID", "DO", "DOES", "EPS", "ETF", "FOR", "FROM", "GOOD", "HAVE", "HE", "HELP", "HOW", "I", "IN", "IS", "IT", "ITS", "MACD", "ME", "MY", "NOW", "OF", "ON", "OR", "PE", "PLEASE", "PRICE", "ROA", "ROE", "RS", "RSI", "SELL", "SHOULD", "SO", "STOCK", "THE", "THAN", "THAT", "THE", "THIS", "THINK", "TODAY", "TO", "TTM", "US", "USD", "WHAT", "WHEN", "WHICH", "WHY", "WITH", "YTD", "YOU", "YOUR"
+]);
+function explicitCopilotTickers(message) {
+  const hasThai = /[\u0E00-\u0E7F]/.test(message);
+  const matches = [...message.matchAll(/(?:^|[^A-Za-z0-9])\$?([A-Za-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)?)(?=$|[^A-Za-z0-9])/g)];
+  const symbols = [];
+  for (const match of matches) {
+    const raw = match[1];
+    const normalized = raw.toUpperCase();
+    const explicit = raw === normalized || /[0-9.$-]/.test(raw) || hasThai;
+    if (!explicit || COPILOT_NON_TICKERS.has(normalized) || !validSymbol(normalized) || symbols.includes(normalized)) continue;
+    symbols.push(normalized);
+    if (symbols.length === 3) break;
+  }
+  return symbols;
+}
+
+async function copilotStockFacts(symbol) {
+  if (!process.env.FINNHUB_API_KEY) return { symbol, verified: false };
+  const key = process.env.FINNHUB_API_KEY;
+  const quoteTask = (async () => {
+    const saved = cached(`quote:${symbol}`);
+    if (saved?.price > 0) return saved;
+    const url = new URL("https://finnhub.io/api/v1/quote");
+    url.searchParams.set("symbol", symbol); url.searchParams.set("token", key);
+    const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+    if (!response.ok) return null;
+    const q = await response.json();
+    if (!(Number(q?.c) > 0)) return null;
+    const result = {
+      symbol, price: Number(q.c), change: q.d == null ? null : Number(q.d),
+      changePercent: q.dp == null ? null : Number(q.dp), high: q.h == null ? null : Number(q.h),
+      low: q.l == null ? null : Number(q.l), open: q.o == null ? null : Number(q.o),
+      previousClose: q.pc == null ? null : Number(q.pc),
+      timestamp: q.t ? new Date(q.t * 1000).toISOString() : null,
+      source: "Finnhub", note: "ความล่าช้าและความครอบคลุมของข้อมูลขึ้นอยู่กับตลาดและแพ็กเกจ API"
+    };
+    setCache(`quote:${symbol}`, result);
+    return result;
+  })();
+  const profileTask = (async () => {
+    const saved = cached(`profile:${symbol}`);
+    if (saved?.name) return saved;
+    const url = new URL("https://finnhub.io/api/v1/stock/profile2");
+    url.searchParams.set("symbol", symbol); url.searchParams.set("token", key);
+    const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+    if (!response.ok) return null;
+    const p = await response.json();
+    if (!p?.name) return null;
+    const result = {
+      symbol, name: p.name, country: p.country, currency: p.currency, exchange: p.exchange,
+      industry: p.finnhubIndustry, marketCapitalization: p.marketCapitalization,
+      shareOutstanding: p.shareOutstanding, weburl: p.weburl, logo: p.logo, source: "Finnhub"
+    };
+    setCache(`profile:${symbol}`, result);
+    return result;
+  })();
+  const metricsTask = (async () => {
+    const saved = cached(`metrics:${symbol}`);
+    if (saved) return saved;
+    const url = new URL("https://finnhub.io/api/v1/stock/metric");
+    url.searchParams.set("symbol", symbol); url.searchParams.set("metric", "all"); url.searchParams.set("token", key);
+    const response = await fetch(url, { signal: AbortSignal.timeout(7000) });
+    if (!response.ok) return null;
+    const m = (await response.json()).metric || {};
+    const result = {
+      symbol, peTTM: m.peTTM ?? null, pbQuarterly: m.pbQuarterly ?? null,
+      roeTTM: m.roeTTM ?? null, roaTTM: m.roaTTM ?? null,
+      netProfitMarginTTM: m.netProfitMarginTTM ?? null,
+      revenueGrowthTTMYoy: m.revenueGrowthTTMYoy ?? null,
+      epsTTM: m.epsTTM ?? null,
+      dividendYieldIndicatedAnnual: m.dividendYieldIndicatedAnnual ?? null, source: "Finnhub"
+    };
+    setCache(`metrics:${symbol}`, result);
+    return result;
+  })();
+  const [quoteResult, profileResult, metricsResult] = await Promise.allSettled([quoteTask, profileTask, metricsTask]);
+  const quote = quoteResult.status === "fulfilled" ? quoteResult.value : null;
+  const profile = profileResult.status === "fulfilled" ? profileResult.value : null;
+  const metrics = metricsResult.status === "fulfilled" ? metricsResult.value : null;
+  return { symbol, quote, profile, metrics, verified: Boolean(quote || profile) };
+}
+
 app.post("/api/copilot", async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(503).json({ error: "ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน Render → Environment" });
   const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
-  const symbol = typeof req.body?.symbol === "string" ? req.body.symbol.trim().toUpperCase() : "";
-  const context = typeof req.body?.context === "string" ? req.body.context.slice(0, 5000) : "";
+  const selectedSymbol = typeof req.body?.symbol === "string" ? req.body.symbol.trim().toUpperCase() : "";
   if (message.length < 1 || message.length > 1500) return res.status(400).json({ error: "คำถามต้องมีความยาว 1–1500 ตัวอักษร" });
-  if (symbol && !validSymbol(symbol)) return res.status(400).json({ error: "Ticker ไม่ถูกต้อง" });
+  if (selectedSymbol && !validSymbol(selectedSymbol)) return res.status(400).json({ error: "Ticker ไม่ถูกต้อง" });
+  const mentionedSymbols = explicitCopilotTickers(message);
+  const symbols = mentionedSymbols.length ? mentionedSymbols : selectedSymbol ? [selectedSymbol] : [];
   const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown").split(",")[0].trim();
   const now = Date.now(); let win = chatWindows.get(ip);
   if (!win || now - win.start > 60_000) win = { start: now, count: 0 };
   win.count++; chatWindows.set(ip, win);
   if (win.count > 8) return res.status(429).json({ error: "Stock Co-Pilot ถึงขีดจำกัดชั่วคราว กรุณารอ 1 นาที" });
   const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
-  const prompt = `คุณคือ Stock Co-Pilot ผู้ช่วยวิจัยหุ้นที่ระมัดระวัง ตอบเป็นภาษาเดียวกับผู้ใช้ (ค่าเริ่มต้นภาษาไทย) อธิบายอย่างเป็นระบบ แยกข้อเท็จจริงออกจากสมมติฐาน หากไม่มีข้อมูลให้บอกตรงๆ ห้ามแต่งตัวเลขหรืออ้างว่าได้ดูราคาสดถ้าไม่มีข้อมูลในบริบท ห้ามรับประกันผลตอบแทน และย้ำความเสี่ยงเมื่อเหมาะสม ไม่ใช่คำแนะนำการลงทุนส่วนบุคคล\nTicker: ${symbol || "ไม่ได้ระบุ"}\nข้อมูลที่เว็บมีให้ (อาจว่าง/ไม่ครบ): ${context || "ไม่มีข้อมูลตลาดแนบมา"}\nคำถาม: ${message}`;
+  const facts = await Promise.all(symbols.map(copilotStockFacts));
+  const contextLines = facts.map(item => {
+    if (!item.verified) return `Ticker ${item.symbol}: Finnhub did not verify a company profile or usable quote. Do not state stock-specific facts or current prices.`;
+    const lines = [`Verified ticker: ${item.symbol} (Finnhub)`];
+    if (item.profile) lines.push(`Company: ${item.profile.name}; exchange: ${item.profile.exchange || "unknown"}; industry: ${item.profile.industry || "unknown"}; currency: ${item.profile.currency || "unknown"}.`);
+    if (item.quote) lines.push(`Latest quote: ${item.quote.price} ${item.profile?.currency || "currency not confirmed"}; daily change: ${Number.isFinite(item.quote.changePercent) ? item.quote.changePercent + "%" : "unavailable"}; quote timestamp: ${item.quote.timestamp || "not provided"}.`);
+    if (item.metrics) {
+      const metricFacts = [
+        ["P/E TTM", item.metrics.peTTM], ["ROE TTM (%)", item.metrics.roeTTM],
+        ["EPS TTM", item.metrics.epsTTM], ["net margin TTM (%)", item.metrics.netProfitMarginTTM],
+        ["revenue growth YoY (%)", item.metrics.revenueGrowthTTMYoy]
+      ].filter(([, value]) => value != null && Number.isFinite(Number(value))).map(([name, value]) => `${name}: ${value}`);
+      if (metricFacts.length) lines.push(`Reported Finnhub metrics: ${metricFacts.join("; ")}.`);
+    }
+    const stage = cached(`stage-analysis:${item.symbol}`);
+    if (stage?.stage) lines.push(`Cached Weinstein stage estimate: Stage ${stage.stage}; 30-week SMA ${stage.sma30}; Mansfield-style RS vs SPY ${stage.mansfieldRsPercent == null ? "unavailable" : stage.mansfieldRsPercent + "%"}.`);
+    return lines.join(" ");
+  });
+  const systemPrompt = `You are Stock Co-Pilot, a careful stock research assistant. Answer in the same language as the user. Use only verified facts in the server-provided context for company-specific or current market claims. The only requested ticker(s) are: ${symbols.join(", ") || "none"}. Ignore any unrelated company shown elsewhere in the user's app. If a ticker was not verified, say so and do not guess its name, price, news, or metrics. Never invent numbers, never claim live data without a quote timestamp, and distinguish facts from estimates. When discussing Weinstein stages, state that the app's stage is a rule-based estimate, not a buy/sell signal. Do not guarantee returns or give personalized investment instructions. Keep the response readable and concise; use Markdown headings, bullets, and bold where helpful.`;
+  const prompt = `Verified server context:\n${contextLines.join("\n") || "No ticker or market data was supplied. Give general information only and ask which ticker if needed."}\n\nUser question:\n${message}`;
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 900 } }),
-      signal: AbortSignal.timeout(25000)
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { temperature: 0.15, maxOutputTokens: 900 } }),
+      signal: AbortSignal.timeout(20000)
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {

@@ -117,6 +117,7 @@ a{color:inherit}
 .result-item:last-child{border-bottom:0}
 .result-item:hover{background:var(--raised)}
 .result-item small{color:var(--muted)}
+.result-item-meta{display:grid;justify-items:end;align-content:center;gap:6px;flex:0 0 auto}
 .stock-section{margin-top:27px}
 .section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:var(--space-4)}
 .section-heading h2{margin:4px 0 2px;font-size:20px;line-height:1.35;font-weight:600}
@@ -196,6 +197,7 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
 .pulse-status.pending{border-color:#665931;background:#302b1d;color:#e4c973}
 #pulse-summary{margin:12px 0 10px;color:var(--text);font-size:12px;line-height:1.75;white-space:pre-line;overflow-wrap:anywhere}
 .pulse-snapshot-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:8px}
+.pulse-ticker .stage-badge{margin-top:8px}
 .pulse-ticker{min-width:0;padding:10px;border:1px solid var(--border);border-radius:var(--r-control);background:var(--panel)}
 .pulse-ticker.unavailable{border-color:rgba(240,123,132,.35)}
 .pulse-ticker-heading{display:flex;align-items:center;justify-content:space-between;gap:5px}
@@ -254,16 +256,34 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
 .market-group-details{display:grid;min-width:0;gap:1px}
 .market-group-details strong{overflow:hidden;color:var(--text);font-size:12px;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
 .market-group-details small{overflow:hidden;color:var(--muted);font-size:10px;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.market-group-details .stage-badge{overflow:visible;white-space:nowrap}
 .market-group-meter{display:block;height:9px;overflow:hidden;border-radius:var(--r-pill);background:var(--soft)}
 .market-group-meter>span{display:block;height:100%;border-radius:inherit;background:var(--positive);transition:width .2s ease}
 .market-group-row.loser .market-group-meter>span{background:var(--negative)}
 .market-group-change{font:700 12px var(--data);text-align:right;white-space:nowrap}
 .market-groups-status{min-height:16px;margin-top:9px;color:var(--subtle);font-size:10px;text-align:right}
 .company-logo{display:grid;width:54px;height:54px;flex:0 0 54px;place-items:center;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--raised);color:var(--accent);font:800 19px/1 var(--data)}
-.company-logo.has-image{background:#fff}
-.company-logo img{display:block;width:100%;height:100%;padding:7px;object-fit:contain}
+.company-logo.has-image{background:transparent}
+.company-logo img{display:block;width:100%;height:100%;padding:0;object-fit:cover;transform:scale(1.25)}
 .stock-company-heading{display:flex;min-width:0;align-items:center;gap:14px}
 .stock-company-heading>div:last-child{min-width:0}
+.stage-analysis{display:grid;gap:12px;margin-top:var(--space-3);padding:16px}
+.stage-analysis-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stage-analysis-heading h3{margin:4px 0 0;font-size:15px;font-weight:550}
+.stage-description{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.stage-note{color:var(--subtle);font-size:10px;line-height:1.55}
+.stage-badge{display:inline-flex;width:max-content;max-width:100%;min-height:23px;align-items:center;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r-pill);background:var(--raised);color:var(--muted);font-size:10px;font-weight:650;line-height:1.25;white-space:normal}
+.stage-badge.compact{min-height:19px;padding:3px 6px;font-size:9px}
+.stage-badge.stage-1{border-color:rgba(230,190,99,.34);background:rgba(230,190,99,.1);color:#dbb75f}
+.stage-badge.stage-2{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent)}
+.stage-badge.stage-3{border-color:rgba(238,155,125,.35);background:rgba(238,155,125,.1);color:#e69c80}
+.stage-badge.stage-4{border-color:rgba(240,123,132,.35);background:var(--red-soft);color:var(--negative)}
+.stage-badge.stage-pending,.stage-badge.stage-unavailable{color:var(--muted)}
+.stage-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stage-metric{min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:var(--r-control);background:var(--raised)}
+.stage-metric span{display:block;overflow:hidden;color:var(--muted);font-size:9px;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.stage-metric strong{display:block;margin-top:5px;overflow-wrap:anywhere;color:var(--text);font:650 12px/1.4 var(--data)}
+.stage-analysis.stage-insufficient .stage-description{color:var(--muted)}
 .chart-panel{margin-top:var(--space-3);scroll-margin-top:18px}
 .chart-heading{align-items:center}
 .chart-heading h3{margin:4px 0 0}
@@ -311,6 +331,7 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
 .portfolio-table td.empty-state{white-space:normal}
 .portfolio-symbol{padding:0;border:0;background:transparent;color:var(--accent);font:700 11px var(--data)}
 .portfolio-symbol:hover{text-decoration:underline}
+.portfolio-symbol-stack{display:grid;justify-items:start;gap:5px}
 
 .tool-card{padding:19px}
 .watch-card,.alert-card{width:100%;max-width:900px}
@@ -335,6 +356,14 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
 .copilot-messages{display:flex;max-height:440px;flex-direction:column;gap:10px;overflow:auto;padding:12px 0}
 .copilot-message{max-width:90%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--r-card);line-height:1.65;overflow-wrap:anywhere}
 .copilot-message p{margin:4px 0 0;white-space:pre-wrap}
+.copilot-message-body>p:first-child{margin-top:4px}
+.copilot-message-body strong{color:var(--text);font-size:inherit}
+.copilot-message-body h3,.copilot-message-body h4{margin:12px 0 4px;color:var(--text);font-size:14px;line-height:1.45}
+.copilot-message-body h4{font-size:12px}
+.copilot-message-body ul,.copilot-message-body ol{margin:6px 0;padding-left:22px}
+.copilot-message-body li{margin:3px 0}
+.copilot-message-body pre{max-width:100%;overflow:auto;padding:9px;border-radius:var(--r-sm);background:var(--bg);font-size:11px}
+.copilot-message-body hr{border:0;border-top:1px solid var(--border)}
 .copilot-message.assistant{align-self:flex-start;background:var(--raised)}
 .copilot-message.user{align-self:flex-end;border-color:var(--accent-border);background:var(--accent-soft)}
 .copilot-message strong{color:var(--accent);font-size:11px}
@@ -497,6 +526,8 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
   .metric-card>span{font-size:10px}
   .metric-card strong{font-size:16px}
   .price-summary-panel{grid-template-columns:1fr 1fr}
+  .stage-analysis-heading{align-items:flex-start;flex-direction:column}
+  .stage-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .price-summary-current{grid-column:1/-1;border-bottom:1px solid var(--border)}
   .price-summary-change{padding:12px}
   .price-summary-current strong{font-size:clamp(26px,7vw,32px)}

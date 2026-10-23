@@ -85,6 +85,12 @@
             <div class="price-summary-change"><span data-i18n="stock.today">เปลี่ยนแปลงวันนี้</span><strong id="today-change">—</strong><small id="today-change-detail" data-i18n="stock.todayHint">เทียบราคาปิดวันก่อน</small></div>
             <div class="price-summary-change"><span data-i18n="stock.ytd">เปลี่ยนแปลงปีนี้ (YTD)</span><strong id="ytd-change">—</strong><small id="ytd-change-detail" data-i18n="stock.ytdHint">เทียบราคาปิดสิ้นปีก่อน</small></div>
           </section>
+          <section id="stage-analysis" class="stage-analysis panel" aria-labelledby="stage-title">
+            <div class="stage-analysis-heading"><div><div class="eyebrow">WEEKLY TREND</div><h3 id="stage-title" data-i18n="stage.title">Stan Weinstein Stage Analysis</h3></div><span id="stage-badge" class="stage-badge stage-pending" data-i18n="stage.loading">กำลังคำนวณ Stage จากข้อมูลรายสัปดาห์…</span></div>
+            <p id="stage-description" class="stage-description" data-i18n="stage.description">ประเมินจากกราฟรายสัปดาห์ เส้น SMA 30 สัปดาห์ และความแข็งแกร่งเทียบ SPY</p>
+            <div id="stage-metrics" class="stage-metrics"></div>
+            <small class="stage-note" data-i18n="stage.note">การประเมินจากกฎราคา ไม่ตรวจรูปแบบฐาน ปริมาณเบรกเอาต์ หรือ breadth ของตลาด และไม่ใช่สัญญาณซื้อขาย</small>
+          </section>
           <section class="stock-overview-group valuation-overview"><div class="stock-group-heading"><h3 data-i18n="stock.valuationHeading">ตัวชี้วัดพื้นฐาน</h3></div><div class="metrics-grid metrics-secondary">
             <article class="metric-card"><span data-i18n="stock.marketCap">มูลค่าตลาด</span><strong id="market-cap">—</strong><small data-i18n="stock.marketCapHint">หน่วยตามแหล่งข้อมูล</small></article>
             <article class="metric-card"><span>P/E (TTM)</span><strong id="pe">—</strong><small data-i18n="stock.peHint">ราคาต่อกำไร</small></article>
