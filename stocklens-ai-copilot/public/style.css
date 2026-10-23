@@ -295,11 +295,23 @@ footer{display:flex;justify-content:space-between;gap:12px;margin-top:var(--spac
 .chart-range-button.active{border-color:var(--accent-border);background:var(--panel);color:var(--accent)}
 .chart-controls select,.inline-form input,.alert-form input,.alert-form select,.portfolio-form input,.portfolio-form select,.profile-form input,.setting-control select,.workspace-dialog input,.copilot-form textarea{min-width:0;border:1px solid var(--border);border-radius:var(--r-control);background:var(--bg);color:var(--text)}
 .chart-controls select{min-height:38px;padding:6px 9px;font-size:11px}
+.chart-level-toggle{min-height:38px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-control);background:var(--raised);color:var(--muted);font-size:10px;font-weight:550;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.chart-level-toggle:hover{border-color:var(--border-strong);color:var(--text)}
+.chart-level-toggle[aria-pressed="true"]{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent)}
 #chart-load{min-height:38px}
 .price-chart{min-height:100px}
 .price-chart svg{display:block;width:100%;height:auto;max-height:300px;overflow:visible}
 .chart-gridline{stroke:var(--border);stroke-width:1;stroke-dasharray:3 5}
 .chart-label{fill:var(--muted);font:11px var(--data)}
+.chart-level-line{fill:none;stroke-width:1.5;stroke-dasharray:6 4;vector-effect:non-scaling-stroke}
+.chart-level-line.chart-level-support{stroke:var(--positive)}
+.chart-level-line.chart-level-resistance{stroke:var(--negative)}
+.chart-level-label{stroke-width:.8;vector-effect:non-scaling-stroke}
+.chart-level-label.chart-level-support{fill:var(--accent-soft);stroke:var(--accent-border)}
+.chart-level-label.chart-level-resistance{fill:var(--red-soft);stroke:rgba(240,123,132,.4)}
+.chart-level-price{font:600 9px var(--data)}
+.chart-level-price.chart-level-support{fill:var(--positive)}
+.chart-level-price.chart-level-resistance{fill:var(--negative)}
 .chart-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .chart-area{fill:rgba(101,217,164,.1);stroke:none}
 .chart-point{fill:var(--accent);stroke:var(--panel);stroke-width:2;vector-effect:non-scaling-stroke}
