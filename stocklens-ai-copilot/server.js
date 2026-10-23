@@ -392,19 +392,20 @@ const MARKET_GROUPS = [
   ["TLT", "US Treasury 20Y+", "พันธบัตรรัฐบาลสหรัฐฯ 20 ปีขึ้นไป", "US Treasury bonds 20Y+", "พันธบัตรรัฐบาลสหรัฐฯ 20 ปีขึ้นไป"],
   ["GLD", "Gold", "ทองคำ", "Gold", "ทองคำ"],
   ["SMH", "Semiconductors", "เซมิคอนดักเตอร์", "Semiconductors", "เซมิคอนดักเตอร์"],
+  ["DRAM", "Memory", "หน่วยความจำ", "Memory semiconductors", "เซมิคอนดักเตอร์หน่วยความจำ"],
   ["BUG", "Cybersecurity", "ความปลอดภัยไซเบอร์", "Cybersecurity", "ความปลอดภัยไซเบอร์"],
   ["IGV", "Software", "ซอฟต์แวร์", "Software", "ซอฟต์แวร์"],
   ["XBI", "Biotechnology", "เทคโนโลยีชีวภาพ", "Biotechnology", "เทคโนโลยีชีวภาพ"],
   ["TAN", "Solar", "พลังงานแสงอาทิตย์", "Solar energy", "พลังงานแสงอาทิตย์"],
   ["NLR", "Nuclear Energy", "พลังงานนิวเคลียร์", "Nuclear energy", "พลังงานนิวเคลียร์"],
-  ["ARKX", "Space Exploration", "เทคโนโลยีอวกาศ", "Space exploration", "เทคโนโลยีอวกาศ"],
+  ["NASA", "Space", "อวกาศ", "Space innovators", "นวัตกรรมอวกาศ"],
   ["IBIT", "Bitcoin ETF", "กองทุน Bitcoin", "Bitcoin ETF", "กองทุน Bitcoin"],
   ["MAGS", "Magnificent Seven", "หุ้น 7 นางฟ้า", "Magnificent Seven stocks", "หุ้น 7 นางฟ้า"]
 ];
 let marketGroupsInFlight = null;
 
 app.get("/api/market-groups", async (req, res) => {
-  const cacheKey = "market-groups:v1";
+  const cacheKey = "market-groups:v2";
   const forceRefresh = req.query.refresh === "1";
   const saved = forceRefresh ? null : cached(cacheKey);
   if (saved) return res.json(saved);

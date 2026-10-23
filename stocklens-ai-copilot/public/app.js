@@ -142,7 +142,9 @@ function renderMarketGroups(data = cachedMarketGroups) {
   });
   const validItems = (data?.items || []).filter(item => item.changePercent != null && Number.isFinite(Number(item.changePercent)));
   const rows = validItems.filter(item => activeMoverView === "up" ? Number(item.changePercent) > 0 : Number(item.changePercent) < 0)
-    .sort((a, b) => activeMoverView === "up" ? Number(b.changePercent) - Number(a.changePercent) : Number(a.changePercent) - Number(b.changePercent))
+    .sort((a, b) => activeMoverView === "up"
+      ? Number(b.changePercent) - Number(a.changePercent)
+      : Number(a.changePercent) - Number(b.changePercent))
     .slice(0, 10);
   if (!rows.length) {
     const empty = document.createElement("p");
@@ -151,13 +153,16 @@ function renderMarketGroups(data = cachedMarketGroups) {
     host.append(empty);
   } else {
     const maxChange = Math.max(...rows.map(item => Math.abs(Number(item.changePercent))), 0.01);
-    for (const item of rows) {
+    rows.forEach((item, index) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "market-group-row" + (Number(item.changePercent) < 0 ? " loser" : "");
       button.setAttribute("aria-label", `${item.nameEn} ${item.symbol} · ${currentLanguage === "en" ? item.descriptionEn : item.descriptionTh} · ${Number(item.changePercent) >= 0 ? "+" : ""}${Number(item.changePercent).toFixed(2)}%`);
       const identity = document.createElement("span");
       identity.className = "market-group-identity";
+      const rank = document.createElement("span");
+      rank.className = "market-group-rank";
+      rank.textContent = String(index + 1).padStart(2, "0");
       const ticker = document.createElement("span");
       ticker.className = "market-group-ticker";
       ticker.textContent = item.symbol;
@@ -168,7 +173,7 @@ function renderMarketGroups(data = cachedMarketGroups) {
       const description = document.createElement("small");
       description.textContent = currentLanguage === "en" ? item.descriptionEn : item.descriptionTh;
       details.append(name, description);
-      identity.append(ticker, details);
+      identity.append(rank, ticker, details);
       const meter = document.createElement("span");
       meter.className = "market-group-meter";
       const fill = document.createElement("span");
@@ -181,7 +186,7 @@ function renderMarketGroups(data = cachedMarketGroups) {
       button.append(identity, meter, change);
       button.addEventListener("click", () => loadStock(item.symbol));
       host.append(button);
-    }
+    });
   }
   const status = $("market-groups-status");
   if (data?.updatedAt) {
