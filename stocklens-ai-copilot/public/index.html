@@ -14,117 +14,118 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="/"><span class="brand-mark"><i data-lucide="chart-no-axes-combined"></i></span><span>StockLens<span class="brand-ai"> AI</span></span></a>
-      <div class="side-label">WORKSPACE</div>
+      <a class="brand" href="#dashboard" data-page-target="dashboard" aria-label="StockLens AI"><span class="brand-mark"><i data-lucide="chart-no-axes-combined"></i></span><span>StockLens<span class="brand-ai"> AI</span></span></a>
+      <div class="side-label" data-i18n="nav.workspace">WORKSPACE</div>
       <div class="workspace-controls">
-        <label class="sr-only" for="workspace-select">เลือก Workspace</label>
+        <label class="sr-only" for="workspace-select" data-i18n="workspace.select">เลือก Workspace</label>
         <select id="workspace-select" aria-label="เลือก Workspace"></select>
         <button id="workspace-add" class="workspace-action" type="button" aria-label="เพิ่ม Workspace" title="เพิ่ม Workspace">+</button>
         <details class="workspace-more">
           <summary aria-label="ตัวเลือก Workspace" title="ตัวเลือก Workspace">•••</summary>
           <div class="workspace-menu">
-            <button id="workspace-rename" type="button">เปลี่ยนชื่อ</button>
-            <button id="workspace-delete" type="button" class="danger-action">ลบ Workspace</button>
+            <button id="workspace-rename" type="button" data-i18n="workspace.rename">เปลี่ยนชื่อ</button>
+            <button id="workspace-delete" type="button" class="danger-action" data-i18n="workspace.delete">ลบ Workspace</button>
           </div>
         </details>
       </div>
-      <div class="nav-section-label">ช่องทาง</div>
-      <nav class="sidebar-nav" aria-label="ช่องทางใน Workspace">
-        <a class="nav active" href="#market-pulse" data-nav-target="market-pulse" aria-current="page"><i data-lucide="layout-dashboard"></i> ภาพรวมตลาด</a>
-        <a class="nav" href="#research" data-nav-target="research"><i data-lucide="search"></i> วิเคราะห์หุ้น</a>
-        <a class="nav" href="#fundamentals" data-nav-target="fundamentals" data-requires-stock="true"><i data-lucide="file-spreadsheet"></i> ตัวชี้วัด</a>
-        <a class="nav" href="#watch-card" data-nav-target="watch-card"><i data-lucide="bookmark"></i> รายการติดตาม</a>
-        <a class="nav" href="#alert-card" data-nav-target="alert-card"><i data-lucide="bell"></i> แจ้งเตือนราคา</a>
-        <a class="nav" href="#history-chart" data-nav-target="history-chart"><i data-lucide="chart-no-axes-column-increasing"></i> กราฟย้อนหลัง</a>
-        <a class="nav" href="#stock-copilot" data-nav-target="stock-copilot"><i data-lucide="bot"></i> Stock Co-Pilot</a>
+      <div class="nav-section-label" data-i18n="nav.section">เมนูหลัก</div>
+      <nav class="sidebar-nav" aria-label="เมนูหลัก">
+        <a class="nav active" href="#dashboard" data-page-target="dashboard" aria-current="page"><i data-lucide="layout-dashboard"></i><span data-i18n="nav.dashboard">ภาพรวมตลาด</span></a>
+        <a class="nav" href="#stocks" data-page-target="stocks"><i data-lucide="search"></i><span data-i18n="nav.stocks">หุ้น / วิเคราะห์</span></a>
+        <a class="nav" href="#portfolio" data-page-target="portfolio"><i data-lucide="briefcase-business"></i><span data-i18n="nav.portfolio">พอร์ตหุ้น</span></a>
+        <a class="nav" href="#watchlist" data-page-target="watchlist"><i data-lucide="bookmark"></i><span data-i18n="nav.watchlist">รายการติดตาม</span></a>
+        <a class="nav" href="#alerts" data-page-target="alerts"><i data-lucide="bell"></i><span data-i18n="nav.alerts">แจ้งเตือนราคา</span></a>
+        <a class="nav" href="#copilot" data-page-target="copilot"><i data-lucide="bot"></i><span data-i18n="nav.copilot">Stock Co-Pilot</span></a>
       </nav>
+      <div class="sidebar-utility">
+        <a class="nav" href="#profile" data-page-target="profile"><i data-lucide="circle-user-round"></i><span data-i18n="nav.profile">โปรไฟล์</span></a>
+        <a class="nav" href="#settings" data-page-target="settings"><i data-lucide="settings-2"></i><span data-i18n="nav.settings">ตั้งค่า</span></a>
+      </div>
       <div class="sidebar-bottom">
         <div class="source-status"><span id="integration-dot" class="status-dot"></span><div><strong id="integration-title">กำลังตรวจบริการ</strong><small id="integration-list">Finnhub · Gemini · Neon</small></div></div>
-        <small class="muted">ข้อมูลขึ้นอยู่กับสิทธิ์ API และตลาด</small>
+        <small class="muted" data-i18n="nav.dataNote">ข้อมูลขึ้นอยู่กับสิทธิ์ API และตลาด</small>
       </div>
     </aside>
+
     <main class="main">
       <header class="topbar">
-        <div><div class="eyebrow">EQUITY RESEARCH PLATFORM</div><h1>ตลาดของคุณ ในมุมที่ลึกกว่า</h1></div>
-        <div class="top-actions"><button id="theme-toggle" class="icon-button" type="button" aria-label="เปลี่ยนธีม">◐</button><span class="live-pill"><span class="status-dot"></span> API WORKSPACE</span></div>
+        <div><div class="eyebrow" data-i18n="topbar.eyebrow">EQUITY RESEARCH PLATFORM</div><h1 id="page-title">ภาพรวมตลาด</h1></div>
+        <div class="top-actions"><span class="live-pill"><span class="status-dot"></span><span data-i18n="topbar.connected">เชื่อมต่อบริการ</span></span><a class="profile-chip" href="#profile" data-page-target="profile"><span id="profile-avatar-small">U</span><span id="profile-name-small" data-i18n="profile.defaultName">โปรไฟล์</span></a></div>
       </header>
-      <section class="hero">
-        <div class="hero-copy"><div class="eyebrow light">RESEARCH WITH CONTEXT</div><h2>เข้าใจธุรกิจ<br><span>ก่อนตัดสินใจลงทุน</span></h2><p>ค้นหาหุ้น ดูข้อมูลบริษัท ตัวชี้วัด และอ่านสรุปเบื้องต้นจากข้อมูลที่ดึงได้จริง</p></div>
-        <div class="hero-art"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="hero-chart"><span>STOCKLENS / RESEARCH</span><svg viewBox="0 0 340 150" role="img" aria-label="ตกแต่งกราฟ"><path d="M0 120 L28 104 L48 112 L73 72 L96 85 L123 58 L148 76 L174 43 L199 60 L224 35 L247 50 L272 18 L300 31 L340 8" fill="none" stroke="#78e0b1" stroke-width="3"/><path d="M0 120 L28 104 L48 112 L73 72 L96 85 L123 58 L148 76 L174 43 L199 60 L224 35 L247 50 L272 18 L300 31 L340 8 L340 150 L0 150Z" fill="url(#fill)" opacity=".22"/><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78e0b1"/><stop offset="1" stop-color="#78e0b1" stop-opacity="0"/></linearGradient></defs></svg><div class="chart-foot"><span>Market data</span><span>Source-dependent</span></div></div></div>
-      </section>
-      <section class="market-pulse panel" id="market-pulse">
-        <div class="panel-head pulse-heading">
-          <div><div class="eyebrow">SCHEDULED MARKET BRIEF</div><h3>ภาพรวมตลาดประจำวัน</h3><p class="muted">Cron ดึงราคา Finnhub แล้วให้ Gemini สรุปและเก็บประวัติไว้ใน Neon</p></div>
-          <button id="pulse-refresh" class="pulse-refresh" type="button">โหลดข้อมูลล่าสุด</button>
-        </div>
-        <div class="pulse-content">
-          <article class="pulse-summary-card">
-            <div class="pulse-meta"><span id="pulse-date">กำลังโหลด…</span><span id="pulse-status" class="pulse-status">กำลังเชื่อมต่อ Neon</span></div>
-            <p id="pulse-summary">กำลังโหลดสรุปตลาดล่าสุด</p>
-            <small id="pulse-model" class="muted"></small>
-          </article>
-          <div id="pulse-snapshots" class="pulse-snapshot-grid"><div class="chart-placeholder">กำลังโหลดข้อมูลราคา…</div></div>
-        </div>
-        <p id="pulse-footnote" class="footnote">ข้อมูลเป็น snapshot ตามเวลาที่ cron ทำงาน ไม่ใช่ราคาสด</p>
-      </section>
-      <section class="search-panel" id="research">
-        <div class="section-heading"><div><div class="eyebrow">STOCK SCREENER</div><h2>ค้นหาบริษัท</h2></div><span class="subtle">US symbols first · Thai coverage depends on provider</span></div>
-        <form id="search-form" class="search-row"><i data-lucide="search"></i><input id="symbol-input" autocomplete="off" placeholder="ค้นหา AAPL, MSFT หรือชื่อบริษัท..." aria-label="ค้นหาหุ้น"><button type="submit">ค้นหา <i data-lucide="arrow-up-right"></i></button></form>
-        <div id="search-results" class="search-results hidden"></div>
-        <div class="quick-picks"><span>ลองค้นหา</span><button data-symbol="AAPL">AAPL</button><button data-symbol="MSFT">MSFT</button><button data-symbol="NVDA">NVDA</button><button data-symbol="PTT.BK">PTT.BK</button>
-      </section>
-      <section id="stock-section" class="stock-section hidden">
-        <div class="section-heading"><div><div class="eyebrow">COMPANY OVERVIEW</div><h2 id="company-name">—</h2><p id="company-meta" class="subtle">—</p></div><span id="stock-symbol" class="ticker-badge">—</span></div>
-        <div class="metrics-grid">
-          <article class="metric-card"><span>ราคาล่าสุด</span><strong id="price">—</strong><small id="price-change">ข้อมูลจาก Finnhub</small></article>
-          <article class="metric-card"><span>Market Cap</span><strong id="market-cap">—</strong><small>หน่วยตามแหล่งข้อมูล</small></article>
-          <article class="metric-card"><span>P/E (TTM)</span><strong id="pe">—</strong><small>ราคาต่อกำไร</small></article>
-          <article class="metric-card"><span>ROE (TTM)</span><strong id="roe">—</strong><small>ผลตอบแทนต่อส่วนผู้ถือหุ้น</small></article>
-        </div>
-        <div class="content-grid">
-          <article class="panel" id="fundamentals"><div class="panel-head"><div><div class="eyebrow">KEY METRICS</div><h3>ตัวชี้วัดทางการเงิน</h3></div><i data-lucide="chart-no-axes-combined"></i></div><div class="metric-list"><div><span>ROA</span><strong id="roa">—</strong></div><div><span>Net Profit Margin</span><strong id="margin">—</strong></div><div><span>Revenue Growth YoY</span><strong id="growth">—</strong></div><div><span>EPS (TTM)</span><strong id="eps">—</strong></div><div><span>Dividend Yield</span><strong id="dividend">—</strong></div></div><p class="footnote">ตัวชี้วัดบางรายการอาจไม่อยู่ในแพ็กเกจ API หรือไม่มีข้อมูลสำหรับบริษัทนั้น</p></article>
-          <article class="panel analysis-panel"><div class="panel-head"><div><div class="eyebrow">RESEARCH NOTES</div><h3>สรุปเบื้องต้น</h3></div><i data-lucide="brain-circuit"></i></div><div id="analysis" class="analysis-content"><p class="muted">ค้นหาหุ้นเพื่อดูข้อสังเกตจากตัวชี้วัด</p></div><p class="footnote">ไม่ใช่คำแนะนำการลงทุน · ระบบนี้ยังไม่ใช่ AI LLM</p></article>
-        </div>
-        <div class="data-note" id="data-note"><i data-lucide="info"></i><span>ข้อมูลจะถูกแสดงตามสิทธิ์และความพร้อมใช้งานของผู้ให้บริการ</span></div>
-      </section>
 
-      <section class="tool-grid" id="workspace-tools" aria-label="เครื่องมือใน Workspace">
-        <article class="tool-card watch-card" id="watch-card">
-          <div class="tool-title"><div><div class="eyebrow">PERSONAL WORKSPACE</div><h3>รายการติดตาม</h3></div><span class="tool-icon">☆</span></div>
-          <p class="muted">เก็บ Ticker ที่สนใจไว้ในอุปกรณ์นี้</p>
-          <div class="inline-form"><input id="watch-input" placeholder="เพิ่มหุ้น เช่น AAPL" aria-label="Ticker ที่ต้องการติดตาม" maxlength="20"><button id="watch-add" type="button">เพิ่ม</button></div>
-          <div id="watchlist" class="watchlist"><p class="empty-state">ยังไม่มีหุ้นที่ติดตาม</p></div>
-        </article>
-        <article class="tool-card alert-card" id="alert-card">
-          <div class="tool-title"><div><div class="eyebrow">PRICE WATCH</div><h3>แจ้งเตือนราคา</h3></div><span class="tool-icon">⌁</span></div>
-          <p class="muted">ตั้งราคาเป้าหมาย ระบบตรวจเมื่อคุณเปิดหน้าเว็บนี้</p>
-          <div class="alert-form"><input id="alert-symbol" placeholder="Ticker" aria-label="Ticker สำหรับแจ้งเตือน" maxlength="20"><select id="alert-direction" aria-label="เงื่อนไขราคา"><option value="above">ราคาสูงกว่าหรือเท่ากับ</option><option value="below">ราคาต่ำกว่าหรือเท่ากับ</option></select><input id="alert-price" type="number" min="0.0001" step="any" placeholder="ราคาเป้าหมาย" aria-label="ราคาเป้าหมาย"><button id="alert-add" type="button">ตั้งแจ้งเตือน</button></div>
-          <div id="alerts-list" class="alerts-list"><p class="empty-state">ยังไม่มีการแจ้งเตือน</p></div>
-        </article>
-      </section>
-      <section class="chart-panel panel" id="history-chart">
-        <div class="panel-head chart-heading"><div><div class="eyebrow">PRICE HISTORY</div><h3>กราฟราคาย้อนหลัง</h3><p id="chart-caption" class="muted">ค้นหาหุ้นก่อน แล้วเลือกช่วงเวลาที่ต้องการ</p></div><div class="chart-controls"><select id="chart-range" aria-label="ช่วงเวลากราฟ"><option value="30">1 เดือน</option><option value="90" selected>3 เดือน</option><option value="180">6 เดือน</option><option value="365">1 ปี</option></select><button id="chart-load" type="button">โหลดกราฟ</button></div></div>
-        <div id="price-chart" class="price-chart"><div class="chart-placeholder">กราฟจะปรากฏที่นี่หลังเลือกหุ้น</div></div>
-        <div class="chart-legend"><span>● ราคาปิดรายวัน</span><button id="export-csv" type="button" disabled>ส่งออกข้อมูล CSV</button></div>
-      </section>
-      <section class="copilot-panel panel" id="stock-copilot">
-        <div class="panel-head"><div><div class="eyebrow">AI RESEARCH ASSISTANT</div><h3>Stock Co-Pilot</h3><p class="muted">ถามเรื่องธุรกิจ งบการเงิน ความเสี่ยง หรือขอให้ช่วยอธิบายหุ้น</p></div><span class="copilot-badge">GEMINI LLM</span></div>
-        <div id="copilot-messages" class="copilot-messages" aria-live="polite"><div class="copilot-message assistant"><strong>Stock Co-Pilot</strong><p>สวัสดีครับ ผมช่วยอธิบายข้อมูลหุ้นและประเด็นที่ควรศึกษาต่อได้ หากข้อมูลตลาดไม่ถูกแนบมา ผมจะบอกให้ทราบแทนการเดาตัวเลข</p></div></div>
-        <form id="copilot-form" class="copilot-form"><textarea id="copilot-input" maxlength="1500" rows="2" placeholder="ถาม Stock Co-Pilot… เช่น AAPL มีความเสี่ยงหลักอะไรบ้าง?" aria-label="ถาม Stock Co-Pilot" required></textarea><button id="copilot-send" type="submit">ส่งคำถาม ↗</button></form>
-        <p class="footnote">AI อาจผิดพลาด · ไม่ใช่คำแนะนำซื้อขาย · อย่าใส่ข้อมูลส่วนตัวหรือ API Key ในช่องแชต</p>
-      </section>
-      <footer><span>STOCKLENS AI · DAILY MARKET PULSE</span><span>Research tool · Not investment advice</span></footer>
+      <div class="page-view active" id="page-dashboard" data-page-view="dashboard">
+        <section class="hero">
+          <div class="hero-copy"><div class="eyebrow light" data-i18n="dashboard.eyebrow">RESEARCH WITH CONTEXT</div><h2><span data-i18n="dashboard.heroFirst">เข้าใจธุรกิจ</span><br><span data-i18n="dashboard.heroSecond">ก่อนตัดสินใจลงทุน</span></h2><p data-i18n="dashboard.heroDescription">ดูภาพรวมตลาด ติดตามหุ้น และตรวจผลการลงทุนจากข้อมูลในที่เดียว</p><a class="hero-link" href="#stocks" data-page-target="stocks"><span data-i18n="dashboard.explore">เริ่มวิเคราะห์หุ้น</span><i data-lucide="arrow-up-right"></i></a></div>
+          <div class="hero-art"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="hero-chart"><span>STOCKLENS / RESEARCH</span><svg viewBox="0 0 340 150" role="img" aria-label="Market trend"><path d="M0 120 L28 104 L48 112 L73 72 L96 85 L123 58 L148 76 L174 43 L199 60 L224 35 L247 50 L272 18 L300 31 L340 8" fill="none" stroke="#78e0b1" stroke-width="3"/><path d="M0 120 L28 104 L48 112 L73 72 L96 85 L123 58 L148 76 L174 43 L199 60 L224 35 L247 50 L272 18 L300 31 L340 8 L340 150 L0 150Z" fill="url(#fill)" opacity=".22"/><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#78e0b1"/><stop offset="1" stop-color="#78e0b1" stop-opacity="0"/></linearGradient></defs></svg><div class="chart-foot"><span>Market data</span><span>Source-dependent</span></div></div></div>
+        </section>
+        <section class="market-pulse panel" id="market-pulse">
+          <div class="panel-head pulse-heading"><div><div class="eyebrow">SCHEDULED MARKET BRIEF</div><h3 data-i18n="pulse.title">ภาพรวมตลาดประจำวัน</h3><p class="muted" data-i18n="pulse.description">สรุปจากราคา Finnhub, Gemini และประวัติที่บันทึกใน Neon</p></div><button id="pulse-refresh" class="pulse-refresh" type="button" data-i18n="pulse.refresh">โหลดข้อมูลล่าสุด</button></div>
+          <div class="pulse-content"><article class="pulse-summary-card"><div class="pulse-meta"><span id="pulse-date" data-i18n="pulse.loadingDate">กำลังโหลด…</span><span id="pulse-status" class="pulse-status" data-i18n="pulse.connecting">กำลังเชื่อมต่อ Neon</span></div><p id="pulse-summary" data-i18n="pulse.loading">กำลังโหลดสรุปตลาดล่าสุด</p><small id="pulse-model" class="muted"></small></article><div id="pulse-snapshots" class="pulse-snapshot-grid"><div class="chart-placeholder" data-i18n="pulse.loadingPrices">กำลังโหลดข้อมูลราคา…</div></div></div>
+          <p class="footnote" data-i18n="pulse.footnote">ข้อมูลเป็น snapshot ตามเวลาที่ cron ทำงาน ไม่ใช่ราคาสด</p>
+        </section>
+      </div>
+
+      <div class="page-view" id="page-stocks" data-page-view="stocks">
+        <section class="page-intro"><div><div class="eyebrow" data-i18n="stocks.eyebrow">STOCK RESEARCH</div><h2 data-i18n="stocks.title">ค้นหาและวิเคราะห์หุ้น</h2><p class="muted" data-i18n="stocks.description">เลือกราคา ดูผลต่างวันนี้และตั้งแต่ต้นปี พร้อมกราฟย้อนหลังของหุ้นตัวเดียวกัน</p></div></section>
+        <section class="search-panel" id="research">
+          <form id="search-form" class="search-row"><i data-lucide="search"></i><input id="symbol-input" autocomplete="off" placeholder="ค้นหา Ticker เช่น AAPL, MSFT" aria-label="ค้นหาหุ้น" data-i18n-placeholder="stocks.searchPlaceholder"><button type="submit"><span data-i18n="stocks.search">ค้นหา</span><i data-lucide="arrow-up-right"></i></button></form>
+          <div id="search-results" class="search-results hidden"></div>
+          <div class="quick-picks"><span data-i18n="stocks.popular">หุ้นยอดนิยม</span><button type="button" data-symbol="AAPL">AAPL</button><button type="button" data-symbol="MSFT">MSFT</button><button type="button" data-symbol="NVDA">NVDA</button><button type="button" data-symbol="PTT.BK">PTT.BK</button></div>
+        </section>
+        <section id="stock-section" class="stock-section hidden">
+          <div class="section-heading stock-heading"><div><div class="eyebrow" data-i18n="stocks.company">COMPANY OVERVIEW</div><h2 id="company-name">—</h2><p id="company-meta" class="subtle">—</p></div><div class="stock-heading-actions"><button id="portfolio-add-selected" type="button" class="secondary-button"><i data-lucide="plus"></i><span data-i18n="portfolio.addSelected">เพิ่มเข้าพอร์ต</span></button><span id="stock-symbol" class="ticker-badge">—</span></div></div>
+          <div class="metrics-grid">
+            <article class="metric-card"><span data-i18n="stock.lastPrice">ราคาล่าสุด</span><strong id="price">—</strong><small id="price-source">Finnhub</small></article>
+            <article class="metric-card"><span data-i18n="stock.today">เปลี่ยนแปลงวันนี้</span><strong id="today-change">—</strong><small id="today-change-detail" data-i18n="stock.todayHint">เทียบราคาปิดวันก่อน</small></article>
+            <article class="metric-card"><span data-i18n="stock.ytd">เปลี่ยนแปลงปีนี้ (YTD)</span><strong id="ytd-change">—</strong><small id="ytd-change-detail" data-i18n="stock.ytdHint">เทียบราคาปิดสิ้นปีก่อน</small></article>
+            <article class="metric-card"><span data-i18n="stock.marketCap">มูลค่าตลาด</span><strong id="market-cap">—</strong><small data-i18n="stock.marketCapHint">หน่วยตามแหล่งข้อมูล</small></article>
+            <article class="metric-card"><span>P/E (TTM)</span><strong id="pe">—</strong><small data-i18n="stock.peHint">ราคาต่อกำไร</small></article>
+            <article class="metric-card"><span>ROE (TTM)</span><strong id="roe">—</strong><small data-i18n="stock.roeHint">ผลตอบแทนต่อส่วนผู้ถือหุ้น</small></article>
+          </div>
+          <div class="content-grid"><article class="panel" id="fundamentals"><div class="panel-head"><div><div class="eyebrow">KEY METRICS</div><h3 data-i18n="stock.metricsTitle">ตัวชี้วัดทางการเงิน</h3></div><i data-lucide="chart-no-axes-combined"></i></div><div class="metric-list"><div><span>ROA</span><strong id="roa">—</strong></div><div><span data-i18n="stock.netMargin">อัตรากำไรสุทธิ</span><strong id="margin">—</strong></div><div><span data-i18n="stock.revenueGrowth">การเติบโตรายได้ YoY</span><strong id="growth">—</strong></div><div><span>EPS (TTM)</span><strong id="eps">—</strong></div><div><span data-i18n="stock.dividend">อัตราผลตอบแทนเงินปันผล</span><strong id="dividend">—</strong></div></div><p class="footnote" data-i18n="stock.metricsFootnote">ข้อมูลบางรายการขึ้นอยู่กับแพ็กเกจ API และอาจไม่มีสำหรับทุกบริษัท</p></article><article class="panel analysis-panel"><div class="panel-head"><div><div class="eyebrow">RESEARCH NOTES</div><h3 data-i18n="stock.analysisTitle">ข้อสังเกตเบื้องต้น</h3></div><i data-lucide="brain-circuit"></i></div><div id="analysis" class="analysis-content"><p class="muted" data-i18n="stock.analysisEmpty">เลือกหุ้นเพื่อดูข้อสังเกตจากตัวชี้วัด</p></div><p class="footnote" data-i18n="stock.analysisNote">ไม่ใช่คำแนะนำการลงทุน</p></article></div>
+          <div class="data-note" id="data-note"><i data-lucide="info"></i><span data-i18n="stock.dataNote">ข้อมูลขึ้นอยู่กับสิทธิ์และความพร้อมใช้งานของผู้ให้บริการ</span></div>
+        </section>
+        <section class="chart-panel panel" id="history-chart"><div class="panel-head chart-heading"><div><div class="eyebrow">PRICE HISTORY</div><h3 data-i18n="chart.title">กราฟราคาย้อนหลัง</h3><p id="chart-caption" class="muted" data-i18n="chart.emptyCaption">เลือกหุ้นเพื่อดูกราฟรายวัน</p></div><div class="chart-controls"><label class="sr-only" for="chart-range" data-i18n="chart.rangeLabel">ช่วงเวลากราฟ</label><select id="chart-range" aria-label="ช่วงเวลากราฟ"><option value="30" data-i18n="chart.oneMonth">1 เดือน</option><option value="90" data-i18n="chart.threeMonths">3 เดือน</option><option value="180" data-i18n="chart.sixMonths">6 เดือน</option><option value="365" selected data-i18n="chart.oneYear">1 ปี</option></select><button id="chart-load" type="button" data-i18n="chart.load">โหลดกราฟ</button></div></div><div id="price-chart" class="price-chart"><div class="chart-placeholder" data-i18n="chart.placeholder">กราฟจะแสดงหลังเลือกหุ้น</div></div><div class="chart-legend"><span data-i18n="chart.legend">● ราคาปิดรายวัน</span><button id="export-csv" type="button" disabled data-i18n="chart.export">ส่งออก CSV</button></div></section>
+      </div>
+
+      <div class="page-view" id="page-portfolio" data-page-view="portfolio">
+        <section class="page-intro"><div><div class="eyebrow">PORTFOLIO TRACKER</div><h2 data-i18n="portfolio.title">พอร์ตหุ้นที่ถืออยู่</h2><p class="muted" data-i18n="portfolio.description">บันทึกต้นทุนและติดตามมูลค่าพอร์ตเทียบกับราคาล่าสุด</p></div><button id="portfolio-refresh" class="secondary-button" type="button"><i data-lucide="refresh-cw"></i><span data-i18n="portfolio.refresh">อัปเดตราคาจริง</span></button></section>
+        <div class="portfolio-summary-grid"><article class="metric-card"><span data-i18n="portfolio.cost">ต้นทุนรวม</span><strong id="portfolio-cost">—</strong><small id="portfolio-count" data-i18n="portfolio.positionsCount">จำนวนรายการที่ถือ</small></article><article class="metric-card"><span data-i18n="portfolio.value">มูลค่าปัจจุบัน</span><strong id="portfolio-value">—</strong><small data-i18n="portfolio.liveQuote">อ้างอิงราคาล่าสุด</small></article><article class="metric-card"><span data-i18n="portfolio.unrealized">กำไร/ขาดทุนที่ยังไม่รับรู้</span><strong id="portfolio-profit">—</strong><small id="portfolio-profit-percent">—</small></article></div>
+        <section class="panel portfolio-form-panel"><div class="panel-head"><div><div class="eyebrow">ADD POSITION</div><h3 data-i18n="portfolio.addTitle">เพิ่มหุ้นที่ซื้อแล้ว</h3></div></div><form id="portfolio-form" class="portfolio-form"><label><span data-i18n="portfolio.symbol">Ticker</span><input id="portfolio-symbol" maxlength="20" required placeholder="เช่น AAPL" data-i18n-placeholder="portfolio.symbolPlaceholder"></label><label><span data-i18n="portfolio.buyPrice">ราคาซื้อต่อหุ้น</span><input id="portfolio-buy-price" type="number" min="0.0001" step="any" required placeholder="ราคาต่อหุ้น" data-i18n-placeholder="portfolio.buyPricePlaceholder"></label><label><span data-i18n="portfolio.quantity">จำนวนหุ้น</span><input id="portfolio-quantity" type="number" min="0.000001" step="any" required placeholder="จำนวน" data-i18n-placeholder="portfolio.quantityPlaceholder"></label><label><span data-i18n="portfolio.currency">สกุลเงิน</span><select id="portfolio-currency"><option value="USD">USD</option><option value="THB">THB</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="JPY">JPY</option></select></label><label><span data-i18n="portfolio.buyDate">วันที่ซื้อ</span><input id="portfolio-buy-date" type="date" required></label><button type="submit" class="primary-button"><i data-lucide="plus"></i><span data-i18n="portfolio.add">เพิ่มเข้าพอร์ต</span></button></form><p class="footnote" data-i18n="portfolio.currencyNote">กรอกราคาซื้อและเลือกสกุลเงินให้ตรงกับตลาดของหุ้น · ข้อมูลพอร์ตบันทึกในอุปกรณ์นี้</p></section>
+        <section class="panel portfolio-table-panel"><div class="panel-head"><div><div class="eyebrow">YOUR POSITIONS</div><h3 data-i18n="portfolio.positionsTitle">รายการที่ถือ</h3></div><small id="portfolio-updated" class="muted"></small></div><div class="table-scroll"><table class="portfolio-table"><thead><tr><th data-i18n="portfolio.symbol">หุ้น</th><th data-i18n="portfolio.buyDate">วันที่ซื้อ</th><th data-i18n="portfolio.quantity">จำนวน</th><th data-i18n="portfolio.buyPrice">ต้นทุน/หุ้น</th><th data-i18n="portfolio.currentPrice">ราคาล่าสุด</th><th data-i18n="portfolio.todayPL">วันนี้</th><th data-i18n="portfolio.totalPL">กำไร/ขาดทุน</th><th></th></tr></thead><tbody id="portfolio-rows"><tr><td colspan="8" class="empty-state" data-i18n="portfolio.empty">ยังไม่มีหุ้นในพอร์ต</td></tr></tbody></table></div></section>
+      </div>
+
+      <div class="page-view" id="page-watchlist" data-page-view="watchlist">
+        <section class="page-intro"><div><div class="eyebrow">PERSONAL WORKSPACE</div><h2 data-i18n="watch.title">รายการติดตาม</h2><p class="muted" data-i18n="watch.description">เก็บหุ้นที่สนใจไว้เปิดดูได้รวดเร็ว</p></div></section>
+        <article class="tool-card watch-card" id="watch-card"><div class="tool-title"><div><div class="eyebrow">WATCHLIST</div><h3 data-i18n="watch.title">รายการติดตาม</h3></div><span class="tool-icon">☆</span></div><p class="muted" data-i18n="watch.note">รายการนี้แยกตาม Workspace และบันทึกในอุปกรณ์นี้</p><div class="inline-form"><input id="watch-input" placeholder="เพิ่มหุ้น เช่น AAPL" aria-label="Ticker ที่ต้องการติดตาม" maxlength="20" data-i18n-placeholder="watch.placeholder"><button id="watch-add" type="button" data-i18n="common.add">เพิ่ม</button></div><div id="watchlist" class="watchlist"><p class="empty-state" data-i18n="watch.empty">ยังไม่มีหุ้นที่ติดตาม</p></div></article>
+      </div>
+
+      <div class="page-view" id="page-alerts" data-page-view="alerts">
+        <section class="page-intro"><div><div class="eyebrow">PRICE WATCH</div><h2 data-i18n="alerts.title">แจ้งเตือนราคา</h2><p class="muted" data-i18n="alerts.description">ติดตามระดับราคาที่คุณกำหนด</p></div></section>
+        <article class="tool-card alert-card" id="alert-card"><div class="tool-title"><div><div class="eyebrow">PRICE ALERTS</div><h3 data-i18n="alerts.title">แจ้งเตือนราคา</h3></div><span class="tool-icon">⌁</span></div><p class="muted" data-i18n="alerts.note">ระบบตรวจราคาเมื่อเปิดหน้าเว็บนี้</p><div class="alert-form"><input id="alert-symbol" placeholder="Ticker" aria-label="Ticker สำหรับแจ้งเตือน" maxlength="20" data-i18n-placeholder="alerts.symbolPlaceholder"><select id="alert-direction" aria-label="เงื่อนไขราคา"><option value="above" data-i18n="alerts.above">ราคาสูงกว่าหรือเท่ากับ</option><option value="below" data-i18n="alerts.below">ราคาต่ำกว่าหรือเท่ากับ</option></select><input id="alert-price" type="number" min="0.0001" step="any" placeholder="ราคาเป้าหมาย" aria-label="ราคาเป้าหมาย" data-i18n-placeholder="alerts.targetPlaceholder"><button id="alert-add" type="button" data-i18n="alerts.add">ตั้งแจ้งเตือน</button></div><div id="alerts-list" class="alerts-list"><p class="empty-state" data-i18n="alerts.empty">ยังไม่มีการแจ้งเตือน</p></div></article>
+      </div>
+
+      <div class="page-view" id="page-copilot" data-page-view="copilot">
+        <section class="page-intro"><div><div class="eyebrow">AI RESEARCH ASSISTANT</div><h2>Stock Co-Pilot</h2><p class="muted" data-i18n="copilot.description">ถามเรื่องธุรกิจ งบการเงิน และความเสี่ยง</p></div></section>
+        <section class="copilot-panel panel" id="stock-copilot"><div class="panel-head"><div><div class="eyebrow">GEMINI LLM</div><h3>Stock Co-Pilot</h3><p class="muted" data-i18n="copilot.prompt">ถามเรื่องธุรกิจ งบการเงิน ความเสี่ยง หรือให้ช่วยอธิบายหุ้น</p></div><span class="copilot-badge">GEMINI</span></div><div id="copilot-messages" class="copilot-messages" aria-live="polite"><div class="copilot-message assistant"><strong>Stock Co-Pilot</strong><p data-i18n="copilot.greeting">สวัสดีครับ ผมช่วยอธิบายข้อมูลหุ้นและประเด็นที่ควรศึกษาต่อได้ หากไม่มีข้อมูลตลาดแนบมา ผมจะแจ้งให้ทราบแทนการเดาตัวเลข</p></div></div><form id="copilot-form" class="copilot-form"><textarea id="copilot-input" maxlength="1500" rows="3" placeholder="ถาม Stock Co-Pilot…" aria-label="ถาม Stock Co-Pilot" data-i18n-placeholder="copilot.placeholder" required></textarea><button id="copilot-send" type="submit" data-i18n="copilot.send">ส่งคำถาม ↗</button></form><p class="footnote" data-i18n="copilot.footnote">AI อาจผิดพลาด · ไม่ใช่คำแนะนำซื้อขาย · อย่าใส่ API Key ในช่องแชต</p></section>
+      </div>
+
+      <div class="page-view" id="page-profile" data-page-view="profile">
+        <section class="page-intro"><div><div class="eyebrow">PERSONAL PROFILE</div><h2 data-i18n="profile.title">โปรไฟล์</h2><p class="muted" data-i18n="profile.description">ตั้งชื่อโปรไฟล์ที่แสดงบนอุปกรณ์นี้</p></div></section>
+        <section class="profile-layout"><article class="panel profile-card"><div class="profile-preview"><span id="profile-avatar-large">U</span><div><strong id="profile-preview-name" data-i18n="profile.defaultName">โปรไฟล์</strong><small id="profile-preview-email" data-i18n="profile.localProfile">โปรไฟล์ในอุปกรณ์นี้</small></div></div><form id="profile-form" class="profile-form"><label><span data-i18n="profile.name">ชื่อที่แสดง</span><input id="profile-name" maxlength="40" autocomplete="name" placeholder="ชื่อของคุณ" data-i18n-placeholder="profile.namePlaceholder"></label><label><span data-i18n="profile.email">อีเมล (ไม่บังคับ)</span><input id="profile-email" type="email" maxlength="100" autocomplete="email" placeholder="name@example.com"></label><button class="primary-button" type="submit" data-i18n="common.save">บันทึกโปรไฟล์</button></form></article><aside class="panel profile-note"><i data-lucide="shield-check"></i><h3 data-i18n="profile.privateTitle">ข้อมูลส่วนตัว</h3><p class="muted" data-i18n="profile.privateNote">โปรไฟล์นี้บันทึกไว้ในเบราว์เซอร์ของอุปกรณ์นี้เท่านั้น ยังไม่มีระบบบัญชีหรือซิงก์ข้ามอุปกรณ์</p></aside></section>
+      </div>
+
+      <div class="page-view" id="page-settings" data-page-view="settings">
+        <section class="page-intro"><div><div class="eyebrow">PREFERENCES</div><h2 data-i18n="settings.title">ตั้งค่า</h2><p class="muted" data-i18n="settings.description">ปรับภาษาและรูปแบบหน้าจอ</p></div></section>
+        <section class="settings-grid"><article class="panel setting-card"><span class="setting-icon"><i data-lucide="languages"></i></span><div><h3 data-i18n="settings.language">ภาษา</h3><p class="muted" data-i18n="settings.languageNote">เลือกภาษาของเมนูและข้อความในระบบ</p></div><label class="setting-control"><span class="sr-only" data-i18n="settings.language">ภาษา</span><select id="setting-language" aria-label="ภาษา"><option value="th">ไทย</option><option value="en">English</option></select></label></article><article class="panel setting-card"><span class="setting-icon"><i data-lucide="sun-moon"></i></span><div><h3 data-i18n="settings.theme">ธีม</h3><p class="muted" data-i18n="settings.themeNote">เลือกโหมดสว่างหรือโหมดมืด</p></div><label class="setting-control"><span class="sr-only" data-i18n="settings.theme">ธีม</span><select id="setting-theme" aria-label="ธีม"><option value="dark" data-i18n="settings.dark">มืด</option><option value="light" data-i18n="settings.light">สว่าง</option></select></label></article></section>
+        <p class="footnote settings-footnote" data-i18n="settings.savedLocally">การตั้งค่าจะบันทึกในเบราว์เซอร์ของอุปกรณ์นี้</p>
+      </div>
+
+      <footer><span>STOCKLENS AI · RESEARCH WORKSPACE</span><span data-i18n="footer.disclaimer">ข้อมูลเพื่อการศึกษา · ไม่ใช่คำแนะนำการลงทุน</span></footer>
     </main>
   </div>
-  <dialog id="workspace-dialog" class="workspace-dialog" aria-labelledby="workspace-dialog-title">
-    <form id="workspace-form">
-      <div class="eyebrow">PERSONAL WORKSPACE</div>
-      <h2 id="workspace-dialog-title">เพิ่ม Workspace</h2>
-      <label for="workspace-name">ชื่อ Workspace</label>
-      <input id="workspace-name" maxlength="32" required autocomplete="off" placeholder="เช่น หุ้นระยะยาว">
-      <div class="dialog-actions"><button id="workspace-cancel" type="button" class="secondary-button">ยกเลิก</button><button type="submit" class="primary-button">บันทึก</button></div>
-    </form>
-  </dialog>
+
+  <dialog id="workspace-dialog" class="workspace-dialog" aria-labelledby="workspace-dialog-title"><form id="workspace-form"><div class="eyebrow">PERSONAL WORKSPACE</div><h2 id="workspace-dialog-title">เพิ่ม Workspace</h2><label for="workspace-name" data-i18n="workspace.name">ชื่อ Workspace</label><input id="workspace-name" maxlength="32" required autocomplete="off" placeholder="เช่น หุ้นระยะยาว" data-i18n-placeholder="workspace.namePlaceholder"><div class="dialog-actions"><button id="workspace-cancel" type="button" class="secondary-button" data-i18n="common.cancel">ยกเลิก</button><button type="submit" class="primary-button" data-i18n="common.save">บันทึก</button></div></form></dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="/app.js"></script>
 </body>
