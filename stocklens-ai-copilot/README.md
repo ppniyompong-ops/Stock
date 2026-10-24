@@ -16,19 +16,19 @@
 
 ## การตั้ง cron บน Render
 
-ใช้ `render.yaml` ที่ root ของ repository เป็น Blueprint เพื่อสร้าง Web Service และ Cron Job แยกกัน งาน cron รัน `npm run cron:market-pulse` เวลา 22:00 UTC วันจันทร์ถึงศุกร์ (05:00 น. เวลาไทยของวันถัดไป) หลังตลาดสหรัฐฯ ปิดแล้ว โดยดึงราคา Finnhub, สร้างสรุป JSON ขนาดเล็กด้วย Gemini และ upsert ข้อมูลลง Neon จึงรันซ้ำในวันเดียวกันได้
+`render.yaml` สร้าง Web Service และ Cron Job แยกกัน งาน cron รัน `npm run cron:market-pulse` เวลา 01:30 UTC วันจันทร์ถึงศุกร์ (08:30 น. เวลาไทย) โดยดึงราคา Finnhub, สร้างสรุปภาษาไทยด้วย Gemini และ upsert ข้อมูลลง Neon จึงรันซ้ำในวันเดียวกันได้
 
 Cron Job ต้องมี `FINNHUB_API_KEY`, `GEMINI_API_KEY` และ `DATABASE_URL` ใน Environment ของ service Cron แยกจาก Web Service; Render Cron ไม่มีแผนฟรีและมีค่าบริการขั้นต่ำ $1/เดือน หากยังไม่มีประวัติการรัน ให้ตรวจว่ามี service `stocklens-market-pulse` และกด Trigger Run ในหน้า Runs ของ Render เพื่อเริ่มรอบแรก
 
-Blueprint ระบุ Root Directory เป็น `stocklens-ai-copilot` ให้ทั้งสอง service แล้ว Build Command ใช้ `npm install` ไม่ต้องอัปโหลดหรือแตก ZIP ระหว่าง build
+ใน Render ให้ตั้ง Root Directory เป็น `stocklens-ai-copilot`; Build Command ใช้ `npm install` เพราะไฟล์แอปอยู่ใน Git repository แล้ว ไม่ต้องอัปโหลดหรือแตก ZIP ระหว่าง build
 
-ใส่ `FINNHUB_API_KEY`, `GEMINI_API_KEY` และ `DATABASE_URL` ให้ทั้ง Web Service และ Cron Job ใน Render Environment; ใช้ `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL` และ `MARKET_SYMBOLS` เพื่อปรับโมเดล/หุ้นที่ติดตาม งาน cron ปิดการเชื่อมต่อฐานข้อมูลและออกด้วย exit code เพื่อให้ Render บันทึกผลสำเร็จหรือล้มเหลว
+ใส่ `FINNHUB_API_KEY`, `GEMINI_API_KEY` และ `DATABASE_URL` ให้ทั้ง Web Service และ Cron Job ใน Render Environment; ใช้ `GEMINI_MODEL` และ `MARKET_SYMBOLS` เพื่อปรับโมเดล/หุ้นที่ติดตาม งาน cron ต้องจบด้วย exit code เพื่อให้ Render บันทึกผลสำเร็จหรือล้มเหลว
 
 ## ฟังก์ชัน
 
 - ค้นหาหุ้น ราคา บริษัท และตัวชี้วัดจาก Finnhub; กราฟย้อนหลังใช้ Finnhub ก่อน และสลับไป Yahoo Finance อัตโนมัติเมื่อ Finnhub ไม่ส่งข้อมูลแท่งเทียน
-- Stock Co-Pilot ใช้ Gemini โดยส่ง API key จากฝั่ง server เท่านั้น และแสดงผลเป็นการ์ดสรุป วิเคราะห์ ความเสี่ยง สิ่งที่ควรตรวจต่อ และข้อมูล Finnhub ที่ยืนยันได้ แทนข้อความยาวแบบ Markdown
-- สรุปตลาดประจำวันแบบการ์ดภาพรวม/จุดสังเกต/ข้อควรทราบและ snapshot ราคาเก็บใน Neon/Postgres; หาก AI ล้มเหลวจะสร้างสรุปจากตัวเลขราคาแทน
+- Stock Co-Pilot ใช้ Gemini โดยส่ง API key จากฝั่ง server เท่านั้น
+- สรุปตลาดประจำวันและ snapshot ราคา เก็บใน Neon/Postgres
 - ประวัติรอบ cron พร้อมสถานะสำเร็จ/ล้มเหลว
 - Workspace หลายชุด พร้อมรายการติดตามและแจ้งเตือนราคาแยกตามชุด (เก็บใน browser ของอุปกรณ์นี้)
 - กราฟเส้นราคาปิดย้อนหลัง ปรับช่วงเวลาและส่งออก CSV ได้ พร้อมแสดงชื่อแหล่งข้อมูลที่ใช้
