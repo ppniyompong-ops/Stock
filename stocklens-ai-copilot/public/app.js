@@ -1378,9 +1378,10 @@ async function loadMarketPulse(options = {}) {
       summary.textContent = run?.status === "failed"
         ? t("pulse.runFailed") + ": " + (run.error || t("pulse.checkServices"))
         : t("pulse.refreshPrompt");
+      renderPulseBrief(summary, summary.textContent);
     } else {
       $("pulse-date").textContent = t("pulse.pricesFor") + " " + formatPulseDate(data.brief.as_of_date);
-      summary.textContent = data.brief.summary;
+      renderPulseBrief(summary, data.brief.summary);
     }
 
     initializePulseSymbols(data);
@@ -1391,12 +1392,68 @@ async function loadMarketPulse(options = {}) {
     status.className = "pulse-status failed";
     status.textContent = error.message || t("pulse.errorTitle");
     summary.textContent = t("pulse.checkServices");
+    renderPulseBrief(summary, summary.textContent);
     initializePulseSymbols(null);
     void loadPulseQuotes();
     for (const id of ["pulse-date", "pulse-status", "pulse-summary"]) $(id).dataset.dynamic = "true";
   } finally {
     button.disabled = false;
   }
+}
+
+function renderPulseBrief(host, raw) {
+  let brief = null;
+  if (raw && typeof raw === "object") brief = raw;
+  else {
+    try { brief = JSON.parse(String(raw || "")); } catch {}
+  }
+  host.replaceChildren();
+  if (!brief || typeof brief !== "object" || !brief.summary) {
+    const text = document.createElement("p");
+    text.className = "pulse-brief-legacy";
+    text.textContent = String(raw || "");
+    host.append(text);
+    return;
+  }
+  const title = document.createElement("div");
+  title.className = "pulse-brief-title-row";
+  const heading = document.createElement("h4");
+  heading.textContent = String(brief.headline || (currentLanguage === "en" ? "Market brief" : "สรุปตลาด"));
+  const tone = document.createElement("span");
+  tone.className = "pulse-tone " + (["positive", "negative"].includes(brief.tone) ? brief.tone : "mixed");
+  tone.textContent = brief.tone === "positive" ? (currentLanguage === "en" ? "Positive breadth" : "ภาพรวมบวก")
+    : brief.tone === "negative" ? (currentLanguage === "en" ? "Negative breadth" : "ภาพรวมลบ")
+      : (currentLanguage === "en" ? "Mixed" : "ผสม");
+  title.append(heading, tone);
+  const summary = document.createElement("p");
+  summary.className = "pulse-brief-summary";
+  summary.textContent = String(brief.summary).slice(0, 480);
+  const grid = document.createElement("div");
+  grid.className = "pulse-brief-grid";
+  const makeBriefGroup = (label, values, icon) => {
+    const card = document.createElement("section");
+    card.className = "pulse-brief-group";
+    const groupTitle = document.createElement("strong");
+    groupTitle.textContent = icon + " " + label;
+    const list = document.createElement("ul");
+    (Array.isArray(values) ? values : []).slice(0, 3).forEach(value => {
+      const item = document.createElement("li");
+      item.textContent = String(value).slice(0, 220);
+      list.append(item);
+    });
+    if (!list.children.length) {
+      const item = document.createElement("li");
+      item.textContent = currentLanguage === "en" ? "No notable items in the supplied data." : "ไม่มีประเด็นเด่นจากข้อมูลชุดนี้";
+      list.append(item);
+    }
+    card.append(groupTitle, list);
+    return card;
+  };
+  grid.append(
+    makeBriefGroup(currentLanguage === "en" ? "Market notes" : "จุดสังเกต", brief.insights, "↗"),
+    makeBriefGroup(currentLanguage === "en" ? "Caveats" : "ข้อควรทราบ", brief.watchouts, "ⓘ")
+  );
+  host.append(title, summary, grid);
 }
 
 $("pulse-refresh")?.addEventListener("click", () => loadMarketPulse({ refresh: true }));
@@ -1539,60 +1596,67 @@ const copilotMessages = $("copilot-messages");
 function addCopilotMessage(role, text) {
   const item = document.createElement("div"); item.className = `copilot-message ${role}`;
   const name = document.createElement("strong"); name.textContent = role === "user" ? "คุณ" : "Stock Co-Pilot";
-  const body = document.createElement("div"); body.className = "copilot-message-body"; body.textContent = text;
+  const body = document.createElement("div"); body.className = "copilot-message-body";
+  if (text) body.textContent = text;
   item.append(name, body); copilotMessages.append(item); copilotMessages.scrollTop = copilotMessages.scrollHeight;
+  while (copilotMessages.children.length > 14) copilotMessages.firstElementChild.remove();
   return body;
 }
-function appendCopilotInline(parent, text) {
-  const pattern = /\*\*([^*]+)\*\*|`([^`]+)`/g;
-  let cursor = 0;
-  for (const match of text.matchAll(pattern)) {
-    if (match.index > cursor) parent.append(document.createTextNode(text.slice(cursor, match.index)));
-    const node = document.createElement(match[1] ? "strong" : "code");
-    node.textContent = match[1] || match[2];
-    parent.append(node);
-    cursor = match.index + match[0].length;
-  }
-  if (cursor < text.length) parent.append(document.createTextNode(text.slice(cursor)));
-}
-function renderCopilotMarkdown(element, markdown) {
+function renderCopilotInterface(element, payload) {
+  const result = payload.result || {};
   element.replaceChildren();
-  let list = null;
-  let listKind = "";
-  let codeLines = null;
-  const closeList = () => { list = null; listKind = ""; };
-  for (const line of String(markdown || "").split(/\r?\n/)) {
-    if (/^\s*```/.test(line)) {
-      closeList();
-      if (codeLines) {
-        const pre = document.createElement("pre"); const code = document.createElement("code"); code.textContent = codeLines.join("\n"); pre.append(code); element.append(pre); codeLines = null;
-      } else codeLines = [];
-      continue;
-    }
-    if (codeLines) { codeLines.push(line); continue; }
-    if (!line.trim()) { closeList(); continue; }
-    const heading = line.match(/^\s{0,3}(#{1,3})\s+(.+)$/);
-    if (heading) {
-      closeList();
-      const node = document.createElement(heading[1].length === 1 ? "h3" : "h4");
-      appendCopilotInline(node, heading[2]); element.append(node); continue;
-    }
-    if (/^\s*[-*]\s+/.test(line) || /^\s*\d+[.)]\s+/.test(line)) {
-      const numbered = /^\s*\d+[.)]\s+/.test(line);
-      const kind = numbered ? "ol" : "ul";
-      if (!list || listKind !== kind) { closeList(); list = document.createElement(kind); listKind = kind; element.append(list); }
+  const th = currentLanguage !== "en";
+  const makeTextList = (title, values, className) => {
+    const section = document.createElement("section");
+    section.className = "copilot-result-section " + className;
+    const heading = document.createElement("h4"); heading.textContent = title;
+    const list = document.createElement("ul");
+    (Array.isArray(values) ? values : []).forEach(value => {
+      const item = document.createElement("li"); item.textContent = String(value).slice(0, 240); list.append(item);
+    });
+    if (!list.children.length) {
       const item = document.createElement("li");
-      appendCopilotInline(item, line.replace(numbered ? /^\s*\d+[.)]\s+/ : /^\s*[-*]\s+/, ""));
-      list.append(item); continue;
+      item.textContent = th ? "ยังไม่มีข้อมูลเพียงพอในส่วนนี้" : "Not enough verified data for this section.";
+      list.append(item);
     }
-    if (/^\s*---+\s*$/.test(line)) { closeList(); element.append(document.createElement("hr")); continue; }
-    closeList();
-    const paragraph = document.createElement("p");
-    appendCopilotInline(paragraph, line.trim()); element.append(paragraph, document.createElement("br"));
-  }
-  if (codeLines) {
-    const pre = document.createElement("pre"); const code = document.createElement("code"); code.textContent = codeLines.join("\n"); pre.append(code); element.append(pre);
-  }
+    section.append(heading, list); return section;
+  };
+  const top = document.createElement("div"); top.className = "copilot-result-top";
+  const summaryLabel = document.createElement("span"); summaryLabel.textContent = th ? "สรุปการวิเคราะห์" : "RESEARCH SUMMARY";
+  const model = document.createElement("small"); model.textContent = payload.model || "Gemini";
+  top.append(summaryLabel, model);
+  const summary = document.createElement("p"); summary.className = "copilot-result-summary"; summary.textContent = String(result.summary || "").slice(0, 480);
+  const facts = Array.isArray(payload.verifiedFacts) ? payload.verifiedFacts : [];
+  const factPanel = document.createElement("section"); factPanel.className = "copilot-fact-panel";
+  const factTitle = document.createElement("h4"); factTitle.textContent = th ? "ข้อมูลที่ตรวจสอบได้" : "VERIFIED SNAPSHOT";
+  factPanel.append(factTitle);
+  const factGrid = document.createElement("div"); factGrid.className = "copilot-fact-grid";
+  facts.forEach(fact => {
+    const card = document.createElement("article"); card.className = "copilot-fact-card";
+    const symbol = document.createElement("strong"); symbol.textContent = `${fact.symbol}${fact.company ? " · " + fact.company : ""}`;
+    const details = document.createElement("span");
+    if (fact.quote?.price != null) {
+      const change = fact.quote.changePercent;
+      details.textContent = `${money(fact.quote.price, fact.currency || "USD")} · ${change == null ? t("common.noData") : (change > 0 ? "+" : "") + fmt(change, "%")}`;
+    } else {
+      details.textContent = fact.verified ? (th ? "ไม่มีราคาล่าสุด" : "No latest quote") : (th ? "Finnhub ยังยืนยันข้อมูลนี้ไม่ได้" : "Finnhub could not verify this ticker");
+    }
+    const source = document.createElement("small");
+    source.textContent = fact.quote?.timestamp ? `${fact.quote.source || "Finnhub"} · ${new Date(fact.quote.timestamp).toLocaleString(th ? "th-TH" : "en-US", { timeZone: "Asia/Bangkok", dateStyle: "medium", timeStyle: "short" })}` : (th ? "แหล่งข้อมูล Finnhub" : "Finnhub data source");
+    card.append(symbol, details, source); factGrid.append(card);
+  });
+  if (facts.length) factPanel.append(factGrid);
+  const sections = document.createElement("div"); sections.className = "copilot-result-grid";
+  sections.append(
+    makeTextList(th ? "เหตุผลและประเด็นสำคัญ" : "Analysis and key points", result.analysis, "analysis"),
+    makeTextList(th ? "ความเสี่ยงและข้อมูลที่ยังขาด" : "Risks and data gaps", result.risks, "risk"),
+    makeTextList(th ? "สิ่งที่ควรตรวจสอบต่อ" : "What to check next", result.nextChecks, "next")
+  );
+  const dataNote = document.createElement("p"); dataNote.className = "copilot-data-note";
+  dataNote.textContent = `${th ? "ข้อจำกัดข้อมูล" : "Data note"}: ${result.dataNote || payload.disclaimer || ""}`;
+  element.append(top, summary);
+  if (facts.length) element.append(factPanel);
+  element.append(sections, dataNote);
   element.closest(".copilot-message")?.scrollIntoView({ block: "nearest" });
 }
 copilotForm?.addEventListener("submit", async (event) => {
@@ -1605,7 +1669,7 @@ copilotForm?.addEventListener("submit", async (event) => {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message, symbol: activeSymbol })
     });
-    renderCopilotMarkdown(reply, data.answer);
+    renderCopilotInterface(reply, data);
   }
   catch (error) { reply.textContent = `${error.message || "ส่งคำถามไม่สำเร็จ"} หากยังไม่ได้ตั้ง GEMINI_API_KEY ให้เพิ่มใน Render → Environment แล้ว Deploy ใหม่`; }
   finally { send.disabled = false; send.textContent = "ส่งคำถาม ↗"; copilotInput.focus(); }

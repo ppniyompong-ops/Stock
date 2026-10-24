@@ -2,6 +2,7 @@ services:
   - type: web
     name: stocklens-ai
     runtime: node
+    rootDir: stocklens-ai-copilot
     plan: free
     buildCommand: npm install
     startCommand: npm start
@@ -16,14 +17,17 @@ services:
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
+      - key: GEMINI_FALLBACK_MODEL
+        value: gemini-3.8-flash
       - key: MARKET_SYMBOLS
         value: SPY,QQQ,AAPL,MSFT,NVDA,GOOGL,AMZN,META
   - type: cron
     name: stocklens-market-pulse
     runtime: node
+    rootDir: stocklens-ai-copilot
     buildCommand: npm install
     startCommand: npm run cron:market-pulse
-    schedule: "30 1 * * 1-5"
+    schedule: "0 22 * * 1-5"
     envVars:
       - key: NODE_VERSION
         value: 20
@@ -35,5 +39,7 @@ services:
         sync: false
       - key: GEMINI_MODEL
         value: gemini-3.5-flash-lite
+      - key: GEMINI_FALLBACK_MODEL
+        value: gemini-3.8-flash
       - key: MARKET_SYMBOLS
         value: SPY,QQQ,AAPL,MSFT,NVDA,GOOGL,AMZN,META

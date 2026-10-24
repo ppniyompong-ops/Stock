@@ -5,6 +5,7 @@ const { closeDatabase, ensureSchema, query } = require("../db");
 const SYMBOL_RE = /^[A-Z0-9.^-]{1,20}$/;
 const JOB_NAME = "market-pulse";
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+const FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.8-flash";
 
 function numberOrNull(value) {
   if (value === null || value === undefined || value === "") return null;
@@ -64,14 +65,24 @@ function fallbackBrief(quotes) {
   const best = [...values].sort((a, b) => b.percent - a.percent)[0];
   const worst = [...values].sort((a, b) => a.percent - b.percent)[0];
   const format = item => item.symbol + " " + (item.percent > 0 ? "+" : "") + item.percent.toFixed(2) + "%";
-  const lines = [
-    "• มีราคา " + quotes.length + " ตัว และมีข้อมูลเปอร์เซ็นต์ " + values.length + " ตัว",
-    values.length ? "• ในกลุ่มที่มีข้อมูล: บวก " + advancing + " · ลบ " + declining + " · เฉลี่ย " + (average > 0 ? "+" : "") + average.toFixed(2) + "%" : "• Finnhub ยังไม่ส่งเปอร์เซ็นต์การเปลี่ยนแปลงของหุ้นที่ติดตาม",
-    best ? "• ปรับขึ้นเด่น: " + format(best) : "",
-    worst ? "• ปรับลงเด่น: " + format(worst) : "",
-    "• สรุปจากราคา Finnhub โดยตรง"
-  ];
-  return lines.filter(Boolean).join("\n");
+  return {
+    headline: "สรุปจากราคาตลาด",
+    summary: "มีข้อมูลราคา " + quotes.length + " ตัว โดยมีข้อมูลการเปลี่ยนแปลง " + values.length + " ตัว",
+    tone: values.length ? advancing > declining ? "positive" : declining > advancing ? "negative" : "mixed" : "mixed",
+    insights: values.length ? ["บวก " + advancing + " · ลบ " + declining + " · เฉลี่ย " + (average > 0 ? "+" : "") + average.toFixed(2) + "%", best ? "ขึ้นเด่น: " + format(best) : "", worst ? "ลงเด่น: " + format(worst) : ""].filter(Boolean) : ["Finnhub ยังไม่ส่งเปอร์เซ็นต์การเปลี่ยนแปลงของหุ้นที่ติดตาม"],
+    watchouts: ["สรุปจากราคา Finnhub โดยตรง ไม่มีการคาดการณ์หรือสัญญาณซื้อขาย"]
+  };
+}
+
+function normalizeBrief(value) {
+  if (!value || typeof value !== "object") return null;
+  const clean = (item, max = 220) => typeof item === "string" ? item.replace(/\s+/g, " ").trim().slice(0, max) : "";
+  const headline = clean(value.headline, 100);
+  const summary = clean(value.summary, 420);
+  const tone = ["positive", "mixed", "negative"].includes(value.tone) ? value.tone : "mixed";
+  const insights = Array.isArray(value.insights) ? value.insights.map(item => clean(item)).filter(Boolean).slice(0, 3) : [];
+  const watchouts = Array.isArray(value.watchouts) ? value.watchouts.map(item => clean(item)).filter(Boolean).slice(0, 2) : [];
+  return headline && summary ? { headline, summary, tone, insights, watchouts } : null;
 }
 
 async function createDailyBrief(quotes, asOfDate) {
@@ -81,27 +92,65 @@ async function createDailyBrief(quotes, asOfDate) {
     high: numberOrNull(quote.h), low: numberOrNull(quote.l),
     quoteTime: Number(quote.t) > 0 ? new Date(Number(quote.t) * 1000).toISOString() : null
   }));
-  const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(MODEL) + ":generateContent",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: "สรุปเฉพาะตัวเลขที่ได้รับเป็นภาษาไทย ไม่แต่งข่าวหรือคาดการณ์ แยกภาพรวมและหุ้นที่ขึ้นลงเด่น ไม่ให้คำแนะนำซื้อขาย" }] },
-        contents: [{ role: "user", parts: [{ text: "สรุปข้อมูลราคาตลาดวันที่ " + asOfDate + " ให้เข้าใจง่าย ไม่เกิน 4 bullet:\n" + JSON.stringify(data) }] }],
-        generationConfig: { maxOutputTokens: 500 }
-      }),
-      signal: AbortSignal.timeout(10_000)
+  const schema = {
+    type: "object",
+    properties: {
+      headline: { type: "string" },
+      summary: { type: "string" },
+      tone: { type: "string", enum: ["positive", "mixed", "negative"] },
+      insights: { type: "array", items: { type: "string" }, maxItems: 3 },
+      watchouts: { type: "array", items: { type: "string" }, maxItems: 2 }
+    },
+    required: ["headline", "summary", "tone", "insights", "watchouts"]
+  };
+  const models = [...new Set([MODEL, FALLBACK_MODEL])];
+  let lastError = null;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const model = models[Math.min(attempt < 2 ? 0 : 1, models.length - 1)];
+    try {
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: "You are a concise market-brief analyst. Use only supplied quote data. Do not invent news, causes, projections, or trading advice. Return a small JSON object with a Thai headline, one short Thai summary, tone based only on the count and average of supplied daily percentage changes, up to 3 short insights, and up to 2 caveats. Keep every text field under 180 characters." }] },
+            contents: [{ role: "user", parts: [{ text: "Create a compact market interface brief for " + asOfDate + ". Quote data:\n" + JSON.stringify(data) }] }],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: attempt < 2 ? 420 : 320,
+              responseMimeType: "application/json",
+              responseSchema: schema
+            }
+          }),
+          signal: AbortSignal.timeout(15_000)
+        }
+      );
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const detail = String(payload.error?.message || "").replace(/\s+/g, " ").slice(0, 140);
+        lastError = new Error("Gemini returned " + response.status + (detail ? ": " + detail : ""));
+        if (![408, 429, 500, 502, 503, 504].includes(response.status) && response.status !== 404) break;
+      } else {
+        const candidate = payload.candidates?.[0];
+        const output = (candidate?.content?.parts || []).filter(part => !part.thought).map(part => part.text || "").join("\n").trim();
+        try {
+          const brief = normalizeBrief(JSON.parse(output));
+          if (brief && candidate?.finishReason !== "MAX_TOKENS") return { brief, model };
+          lastError = new Error(candidate?.finishReason === "MAX_TOKENS" ? "Gemini response exceeded the compact brief limit" : "Gemini returned an incomplete brief");
+        } catch {
+          lastError = new Error("Gemini returned an invalid compact brief");
+        }
+      }
+    } catch (error) {
+      lastError = error;
     }
-  );
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const detail = String(payload.error?.message || "").replace(/\s+/g, " ").slice(0, 180);
-    throw new Error(response.status === 429 ? "Gemini rate limit reached" : "Gemini returned " + response.status + (detail ? ": " + detail : ""));
+    if (attempt < 3) {
+      const delay = Math.min(500 * (2 ** attempt) + Math.floor(Math.random() * 300), 3000);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
-  const summary = (payload.candidates?.[0]?.content?.parts || []).map(part => part.text || "").join("\n").trim();
-  if (!summary) throw new Error("Gemini returned an empty market brief");
-  return summary;
+  throw lastError || new Error("Gemini market brief unavailable");
 }
 
 async function runMarketPulse({ trigger = "cron", close = false } = {}) {
@@ -145,12 +194,14 @@ async function runMarketPulse({ trigger = "cron", close = false } = {}) {
     let summaryModel = MODEL;
     let aiError = null;
     try {
-      summary = await createDailyBrief(quotes, asOfDate);
+      const generated = await createDailyBrief(quotes, asOfDate);
+      summary = JSON.stringify(generated.brief);
+      summaryModel = generated.model;
     } catch (error) {
       aiError = error.message;
-      summary = fallbackBrief(quotes);
+      summary = JSON.stringify(fallbackBrief(quotes));
       summaryModel = "rule-based";
-      console.warn("Gemini brief unavailable; saved price-based summary: " + aiError);
+      console.warn("Gemini brief unavailable; saved compact price-based summary: " + String(aiError).slice(0, 160));
     }
 
     const briefSql = [
@@ -166,7 +217,12 @@ async function runMarketPulse({ trigger = "cron", close = false } = {}) {
       "UPDATE cron_runs SET status = 'succeeded', finished_at = NOW(), details = $2::jsonb WHERE id = $1",
       [runId, JSON.stringify(details)]
     );
-    console.log(JSON.stringify({ job: JOB_NAME, status: "succeeded", ...details }));
+    console.log(JSON.stringify({
+      job: JOB_NAME, status: "succeeded", asOfDate, trigger,
+      updatedCount: quotes.length, failedCount: failures.length,
+      updated: quotes.map(item => item.symbol), summaryModel,
+      aiFallback: Boolean(aiError)
+    }));
     return details;
   } catch (error) {
     if (runId !== null) {

@@ -752,6 +752,8 @@ app.get("/api/analysis/:symbol", async (req, res) => {
 
 // Stock Co-Pilot: real Gemini LLM. The key stays server-side only.
 const chatWindows = new Map();
+const COPILOT_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+const COPILOT_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-3.8-flash";
 const COPILOT_NON_TICKERS = new Set([
   "A", "I", "AI", "ALL", "AM", "AN", "AND", "ARE", "AS", "AT", "BE", "BUY", "BY", "CAN", "CEO", "DAY", "DID", "DO", "DOES", "EPS", "ETF", "FOR", "FROM", "GOOD", "HAVE", "HE", "HELP", "HOW", "I", "IN", "IS", "IT", "ITS", "MACD", "ME", "MY", "NOW", "OF", "ON", "OR", "PE", "PLEASE", "PRICE", "ROA", "ROE", "RS", "RSI", "SELL", "SHOULD", "SO", "STOCK", "THE", "THAN", "THAT", "THE", "THIS", "THINK", "TODAY", "TO", "TTM", "US", "USD", "WHAT", "WHEN", "WHICH", "WHY", "WITH", "YTD", "YOU", "YOUR"
 ]);
@@ -836,6 +838,43 @@ async function copilotStockFacts(symbol) {
   return { symbol, quote, profile, metrics, verified: Boolean(quote || profile) };
 }
 
+function normalizeCopilotInterface(value) {
+  if (!value || typeof value !== "object") return null;
+  const clean = (item, limit = 260) => typeof item === "string" ? item.replace(/\s+/g, " ").trim().slice(0, limit) : "";
+  const summary = clean(value.summary, 480);
+  if (!summary) return null;
+  const list = (items, count) => Array.isArray(items) ? items.map(item => clean(item, 240)).filter(Boolean).slice(0, count) : [];
+  return {
+    summary,
+    analysis: list(value.analysis, 4),
+    risks: list(value.risks, 3),
+    nextChecks: list(value.nextChecks, 3),
+    dataNote: clean(value.dataNote, 240)
+  };
+}
+
+function copilotVerifiedSnapshot(item) {
+  return {
+    symbol: item.symbol,
+    verified: item.verified,
+    company: item.profile?.name || null,
+    exchange: item.profile?.exchange || null,
+    currency: item.profile?.currency || null,
+    quote: item.quote ? {
+      price: Number.isFinite(item.quote.price) ? item.quote.price : null,
+      changePercent: Number.isFinite(item.quote.changePercent) ? item.quote.changePercent : null,
+      timestamp: item.quote.timestamp || null,
+      source: item.quote.source || "Finnhub"
+    } : null,
+    metrics: item.metrics ? {
+      peTTM: item.metrics.peTTM != null && Number.isFinite(Number(item.metrics.peTTM)) ? Number(item.metrics.peTTM) : null,
+      roeTTM: item.metrics.roeTTM != null && Number.isFinite(Number(item.metrics.roeTTM)) ? Number(item.metrics.roeTTM) : null,
+      epsTTM: item.metrics.epsTTM != null && Number.isFinite(Number(item.metrics.epsTTM)) ? Number(item.metrics.epsTTM) : null,
+      revenueGrowthTTMYoy: item.metrics.revenueGrowthTTMYoy != null && Number.isFinite(Number(item.metrics.revenueGrowthTTMYoy)) ? Number(item.metrics.revenueGrowthTTMYoy) : null
+    } : null
+  };
+}
+
 app.post("/api/copilot", async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(503).json({ error: "ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน Render → Environment" });
@@ -850,7 +889,6 @@ app.post("/api/copilot", async (req, res) => {
   if (!win || now - win.start > 60_000) win = { start: now, count: 0 };
   win.count++; chatWindows.set(ip, win);
   if (win.count > 8) return res.status(429).json({ error: "Stock Co-Pilot ถึงขีดจำกัดชั่วคราว กรุณารอ 1 นาที" });
-  const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
   const facts = await Promise.all(symbols.map(copilotStockFacts));
   const contextLines = facts.map(item => {
     if (!item.verified) return `Ticker ${item.symbol}: Finnhub did not verify a company profile or usable quote. Do not state stock-specific facts or current prices.`;
@@ -869,22 +907,66 @@ app.post("/api/copilot", async (req, res) => {
     if (stage?.stage) lines.push(`Cached Weinstein stage estimate: Stage ${stage.stage}; 30-week SMA ${stage.sma30}; Mansfield-style RS vs SPY ${stage.mansfieldRsPercent == null ? "unavailable" : stage.mansfieldRsPercent + "%"}.`);
     return lines.join(" ");
   });
-  const systemPrompt = `You are Stock Co-Pilot, a careful stock research assistant. Answer in the same language as the user. Use only verified facts in the server-provided context for company-specific or current market claims. The only requested ticker(s) are: ${symbols.join(", ") || "none"}. Ignore any unrelated company shown elsewhere in the user's app. If a ticker was not verified, say so and do not guess its name, price, news, or metrics. Never invent numbers, never claim live data without a quote timestamp, and distinguish facts from estimates. When discussing Weinstein stages, state that the app's stage is a rule-based estimate, not a buy/sell signal. Do not guarantee returns or give personalized investment instructions. Keep the response readable and concise; use Markdown headings, bullets, and bold where helpful.`;
+  const systemPrompt = `You are Stock Co-Pilot, a careful stock research analyst. Return only concise interface data in the requested JSON schema, in the same language as the user's question. The only requested ticker(s) are: ${symbols.join(", ") || "none"}. Use only verified facts in server context for current or company-specific claims. If a ticker could not be verified, say so without guessing its name, price, news, or metrics. Never invent numbers. Distinguish observed facts from interpretation. Explain the reasoning behind each observation briefly, and state uncertainty or missing data. When discussing Weinstein stages, say they are rule-based estimates, not a signal. No personalized investment instructions, guarantees, or price targets. Keep each list item to one short sentence, and never repeat the raw data table.`;
   const prompt = `Verified server context:\n${contextLines.join("\n") || "No ticker or market data was supplied. Give general information only and ask which ticker if needed."}\n\nUser question:\n${message}`;
+  const schema = {
+    type: "object",
+    properties: {
+      summary: { type: "string" },
+      analysis: { type: "array", items: { type: "string" }, maxItems: 4 },
+      risks: { type: "array", items: { type: "string" }, maxItems: 3 },
+      nextChecks: { type: "array", items: { type: "string" }, maxItems: 3 },
+      dataNote: { type: "string" }
+    },
+    required: ["summary", "analysis", "risks", "nextChecks", "dataNote"]
+  };
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
-      method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { temperature: 0.15, maxOutputTokens: 900 } }),
-      signal: AbortSignal.timeout(20000)
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      console.error("Gemini API error status:", response.status);
-      return res.status(response.status === 429 ? 429 : 502).json({ error: response.status === 429 ? "โควตา Gemini เต็มชั่วคราว กรุณารอสักครู่" : "เรียก Gemini ไม่สำเร็จ ตรวจสอบ API Key, Billing และชื่อโมเดลใน Render" });
+    const models = [...new Set([COPILOT_MODEL, COPILOT_FALLBACK_MODEL])];
+    let lastFailure = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const model = models[attempt === 2 ? Math.min(1, models.length - 1) : 0];
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+          method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.15, maxOutputTokens: attempt === 0 ? 700 : 520, responseMimeType: "application/json", responseSchema: schema }
+          }),
+          signal: AbortSignal.timeout(18000)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          lastFailure = { status: response.status };
+          if (![408, 429, 500, 502, 503, 504].includes(response.status) && response.status !== 404) break;
+        } else {
+          const candidate = data.candidates?.[0];
+          const text = (candidate?.content?.parts || []).filter(part => !part.thought).map(part => part.text || "").join("\n").trim();
+          try {
+            const result = normalizeCopilotInterface(JSON.parse(text));
+            if (result && candidate?.finishReason !== "MAX_TOKENS") {
+              return res.json({
+                result,
+                verifiedFacts: facts.map(copilotVerifiedSnapshot),
+                model,
+                provider: "Google Gemini",
+                disclaimer: "คำตอบ AI อาจผิดพลาดและไม่ใช่คำแนะนำการลงทุน"
+              });
+            }
+            lastFailure = { status: 502, incomplete: true };
+          } catch {
+            lastFailure = { status: 502, incomplete: true };
+          }
+        }
+      } catch (error) {
+        lastFailure = { timeout: error.name === "TimeoutError" };
+      }
+      if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 700 * (2 ** attempt) + Math.floor(Math.random() * 350)));
     }
-    const answer = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || "").join("\n").trim();
-    if (!answer) return res.status(502).json({ error: "Gemini ไม่ส่งคำตอบกลับมา ลองถามใหม่อีกครั้ง" });
-    res.json({ answer, model, provider: "Google Gemini", disclaimer: "คำตอบ AI อาจผิดพลาดและไม่ใช่คำแนะนำการลงทุน" });
+    if (lastFailure?.status === 429) return res.status(429).json({ error: "โควตา Gemini เต็มชั่วคราว ลองสำรองแล้ว กรุณารอสักครู่" });
+    if (lastFailure?.timeout) return res.status(504).json({ error: "Stock Co-Pilot ใช้เวลานานเกินไป กรุณาลองใหม่" });
+    console.error("Gemini Co-Pilot request failed:", lastFailure?.status || "incomplete response");
+    return res.status(502).json({ error: "AI ยังสร้างผลวิเคราะห์แบบสรุปไม่สำเร็จ กรุณาลองใหม่อีกครั้ง" });
   } catch (error) {
     console.error("Stock Co-Pilot request failed:", error.name);
     res.status(504).json({ error: "Stock Co-Pilot ใช้เวลานานเกินไป กรุณาลองใหม่" });
